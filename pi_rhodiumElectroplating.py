@@ -16,9 +16,9 @@ for i in ports:
 
 
 DobotPort = '/dev/ttyACM0'
-ecRelay = Relay(2);
-pdRelay = Relay(3);
-rhRelay = Relay(4);
+ecRelay = Relay(18);#bcm pin for physical pin 12
+pdRelay = Relay(23);#bcm for physical 16
+rhRelay = Relay(24);#bcm for physical 18
 gripper = ServoGripper(2);
 dvc = DigitalVoltControl();
 

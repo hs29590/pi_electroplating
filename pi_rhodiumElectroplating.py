@@ -38,8 +38,10 @@ dobot_interface.set_speed()
 dobot_interface.set_playback_config()
 
 
-z_up = -20
-z_down = -70
+#z_up = -20
+#z_down = -70
+z_up = 20
+z_down = 0
 RH_Voltage = 2.8;
 PD_Voltage = 1.8;
 EC_Voltage = 1.2;

@@ -34,5 +34,5 @@ class ServoGripper():
 
     def __del__(self):
         self.pwm.stop();
-        GPIO.cleanup();
+#        GPIO.cleanup();
 

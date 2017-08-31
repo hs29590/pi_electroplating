@@ -11,7 +11,7 @@ class Relay():
 
     def __del__(self):
         GPIO.output(self.pin, GPIO.HIGH);
-        GPIO.cleanup();
+#    GPIO.cleanup();
 
     def on(self):
         GPIO.output(self.pin, GPIO.LOW);

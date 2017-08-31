@@ -30,9 +30,9 @@ class DobotSerialInterface:
         self.connect(port_name, baud_rate)
 
     def __del__(self):
-        print "Closing  "
+        print("Closing ")
         if self.serial_connection is not None and self.serial_connection.isOpen():
-            print "Closing serial connection"
+            print("Closing serial connection")
             self.serial_connection.close()
         thread.exit();
 
@@ -48,15 +48,15 @@ class DobotSerialInterface:
                 ,timeout=0
             )
         except serial.SerialException as e:
-            print "Could not connect", e
+            print("Could not connect", e);
 
         time.sleep(2)  # no idea why but robot does not move if speed commands are sent
         # directly after opening serial
 
         while self.current_status is None:
-            print "Waiting for status message"
+            print ("Waiting for status message")
             time.sleep(1)
-        print "received first status message with position", self.current_status.position
+        print ("received first status message with position", self.current_status.position)
 
     def is_connected(self):
         return (self.serial_connection is not None) and self.serial_connection.isOpen()
@@ -65,7 +65,7 @@ class DobotSerialInterface:
         assert len(cmd_str_10) == 10
 
         if not self.is_connected():
-            print "No serial connection"
+            print ("No serial connection")
 
         cmd_str_42 = ['\x00']*DobotStatusMessage.MESSAGE_LENGTH
         cmd_str_42[0] = '\xA5'
@@ -92,16 +92,16 @@ class DobotSerialInterface:
         self._send_command(cmd_str_10)
 
     def send_absolute_position(self, x, y, z, rot, move_mode=MOVE_MODE_LINEAR):
-        print "sending position %f %f %f" % (x, y, z)
+        print ("sending position %f %f %f" % (x, y, z))
         self._send_absolute_command(True, x, y, z, rot, move_mode)
 
     def send_absolute_angles(self, base, rear, front, rot,  move_mode=MOVE_MODE_LINEAR):
         # todo: assertions for ranges
-        print "sending angles %f %f %f" % (base, rear, front)
+        print ("sending angles %f %f %f" % (base, rear, front))
         self._send_absolute_command(False, base, rear, front, rot,  move_mode)
 
     def set_initial_angles(self, rear_arm_angle, front_arm_angle):
-        print 'setting angles to', rear_arm_angle, front_arm_angle
+        print( 'setting angles to', rear_arm_angle, front_arm_angle)
         cmd_str_10 = [0]*10
         cmd_str_10[0] = 9
         cmd_str_10[1] = 3  # set initial angle
@@ -112,19 +112,19 @@ class DobotSerialInterface:
     def apply_arm_angle_offsets(self, rear_arm_angle_offset, front_arm_angle_offset):
 
         while self.current_status is None:
-            print "waiting for angle readings"
+            print( "waiting for angle readings")
             # return False
             time.sleep(0.1)
 
         new_rear_angle = rear_arm_angle_offset + self.current_status.get_rear_arm_angle()
         new_front_angle = front_arm_angle_offset + self.current_status.get_front_arm_angle()
 
-        print "front was", self.current_status.get_front_arm_angle(), "will be", new_front_angle
-        print "back was", self.current_status.get_rear_arm_angle(), "will be", new_rear_angle
+        print ("front was", self.current_status.get_front_arm_angle(), "will be", new_front_angle)
+        print ("back was", self.current_status.get_rear_arm_angle(), "will be", new_rear_angle)
 
         # 90-x: not documented, but works
         self.set_initial_angles(90-new_rear_angle, new_front_angle)
-        print "applied arm_angle offsets"
+        print ("applied arm_angle offsets")
         return True
 
     def set_speed(self, VelRat=100, AccRat=100):
@@ -156,7 +156,7 @@ class DobotSerialInterface:
             # time.sleep(0.001)
 
             if self.serial_connection is None:
-                print "Waiting for serial connection"
+                print ("Waiting for serial connection")
                 time.sleep(0.5)
                 continue
 

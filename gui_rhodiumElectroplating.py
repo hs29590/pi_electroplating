@@ -2,8 +2,10 @@
 import time
 import sys
 import serial
-from tkinter import *
-from tkinter import ttk
+from Tkinter import *
+import ttk
+import thread
+#from Tkinter import ttk
 
 from DobotSerialInterface import DobotSerialInterface
 from DigitalVoltControl import DigitalVoltControl
@@ -17,8 +19,15 @@ for i in ports:
 
 root = Tk()
 root.title("Rh Electroplating")
+framew = 500;# root w
+frameh = 200; # root h
+screenw = root.winfo_screenwidth();
+screenh = root.winfo_screenheight();
+posx = (screenw/2) - (framew/2);
+posy = (screenh/2) - (frameh/2);
+root.geometry("%dx%d+%d+%d" % (framew,frameh,posx,posy))
 
-mainframe = ttk.Frame(root, padding="10 10 30 30", height=230, width=530)
+mainframe = ttk.Frame(root, padding="10 10 30 30", height=200, width=500)
 mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 mainframe.columnconfigure(0, weight=50)
 mainframe.rowconfigure(0, weight=50)
@@ -40,15 +49,15 @@ dvc = DigitalVoltControl();
 if len(sys.argv) >= 2:
     DobotPort = sys.argv[1];
 
-print "Setting Port to %s" % (DobotPort);
+print ("Setting Port to %s" % (DobotPort));
     
 dobot_interface = DobotSerialInterface(DobotPort)
 
-print "Opened connection"
+print("Opened connection")
 dobot_interface.set_speed()
 dobot_interface.set_playback_config()
 
-z_up = 20
+z_up = 60
 z_down = 0
 RH_Voltage = 2.8;
 PD_Voltage = 1.8;
@@ -93,7 +102,7 @@ def shake(x, y, z, shakeDuration):
     
 def up_down_beaker(id):
 
-    print "Doing beaker %d now" % (id);
+    print ("Doing beaker %d now" % (id));
     move_xy(Beakers[id][0], Beakers[id][1], z_up);
     move_xy(Beakers[id][0], Beakers[id][1], z_down);
     
@@ -120,22 +129,29 @@ move_xy(home_xyz[0], home_xyz[1], home_xyz[2]);
 
 #gripper.gripperOpen();
 def gripperOpen():
+    print("Inside go");
     gripper.gripperOpen();
 
 def gripperClose():
+    print("Inside gc");
     gripper.gripperClose();
 
 def stopProcess():
-    exit(0);
+    print("Inside sp");
+    root.quit();
+#    exit(0);
 
 def popup():
+    print("Inside po");
     toplevel = Toplevel()
+    toplevel.geometry("300x75+500+500");
     label1 = Label(toplevel, text="Please make sure Robot is at Home Position", height=0, width=100)
     label1.pack(padx=5)
 
     def okpressed():
         toplevel.destroy();
-        startProcess();
+        time.sleep(1);
+        thread.start_new_thread(startProcess, ());
     
     b = Button(toplevel, text="OK", command=okpressed);
     b.pack(pady=5);
@@ -213,15 +229,17 @@ def startProcess():
         move_angles(0, 20, 10);
         move_xy(home_xyz[0], home_xyz[1], home_xyz[2]);
         
-        print "%d loops remaining" % (num_loops);
+# print "%d loops remaining" % (num_loops);
             
-ttk.Button(mainframe, text="Gripper Open", style='my.TButton', command=dummyObject.gripperOpen, width=16).grid(column=3, row=1, sticky=W)
-ttk.Button(mainframe, text="Gripper Close", style='my.TButton', command=dummyObject.gripperClose, width=16).grid(column=3, row=3, sticky=W)
+ttk.Button(mainframe, text="Gripper Open", style='my.TButton', command=gripperOpen, width=16).grid(column=3, row=1, sticky=W)
+ttk.Button(mainframe, text="Gripper Close", style='my.TButton', command=gripperClose, width=16).grid(column=3, row=3, sticky=W)
 ttk.Button(mainframe, text="Start", style='my.TButton',command=popup, width=16).grid(column=1, row=1, sticky=W)
 ttk.Button(mainframe, text="Stop", style='my.TButton', command=stopProcess, width=16).grid(column=1, row=3, sticky=W)
 
+root.mainloop()
 
 #cleanup    
+thread.exit();
 del gripper;
 del dvc;
 del ecRelay;

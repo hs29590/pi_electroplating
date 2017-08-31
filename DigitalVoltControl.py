@@ -53,5 +53,5 @@ class DigitalVoltControl():
         else:
             self.set_value(int((10.8 - desiredV) / 0.084));
 
-    def __del__(self):
-        GPIO.cleanup();
+#    def __del__(self):
+#        GPIO.cleanup();

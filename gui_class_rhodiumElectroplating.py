@@ -173,6 +173,7 @@ class DobotPlating():
         self.move_angles(30, 20, 10);
         self.move_angles(0, 20, 10);
         self.move_xy(self.home_xyz[0], self.home_xyz[1], self.home_xyz[2]);
+        print("\n DONE \n");
         
     def __del__(self):
         del self.gripper;
@@ -188,8 +189,8 @@ class PlatingGUI():
         self.root.title("Rh Electroplating")
         framew = 500; # root w
         frameh = 200; # root h
-        screenw = root.winfo_screenwidth();
-        screenh = root.winfo_screenheight();
+        screenw = self.root.winfo_screenwidth();
+        screenh = self.root.winfo_screenheight();
         posx = (screenw/2) - (framew/2);
         posy = (screenh/2) - (frameh/2);
         self.root.geometry( "%dx%d+%d+%d" % (framew,frameh,posx,posy))
@@ -206,35 +207,31 @@ class PlatingGUI():
         self.buttonStyle = ttk.Style()
         self.buttonStyle.configure('my.TButton', font=('Helvetica', 18))
         
-        self.l = ttk.Label(self.root, textvariable=current_status, font=('Helvetica',18));
-        self.l.place(relx=0.4, rely=0.3, anchor='sw')
+        self.l = ttk.Label(self.root, textvariable=self.current_status, font=('Helvetica',18));
+        self.l.place(relx=0.35, rely=0.3, anchor='sw')
 
         ttk.Button(self.mainframe, text="Gripper Open", style='my.TButton', command=self.gripperOpen, width=16).grid(column=3, row=1, sticky=W)
         ttk.Button(self.mainframe, text="Gripper Close", style='my.TButton', command=self.gripperClose, width=16).grid(column=3, row=3, sticky=W)
         ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(column=1, row=1, sticky=W)
         ttk.Button(self.mainframe, text="Stop", style='my.TButton', command=self.stopProcess, width=16).grid(column=1, row=3, sticky=W)
    
-        self.dobotPlatng = DobotPlating();
-   
+        self.dobotPlating = DobotPlating();
+
     def gripperOpen(self):
-        print("Inside go");
+#        current_status_string = 'Gripper Open';
+#        self.root.update_idletasks()
         self.dobotPlating.gripper.gripperOpen();
-        self.current_status.set('Gripper Open');
-        self.root.update_idletasks()
 
 
     def gripperClose(self):
-        print("Inside gc");
-        self.dobotPlating.gripper.gripperClose();
-        self.current_status.set('Gripper Close');
+#        current_status_string = 'Gripper Close';
         self.root.update_idletasks()
+        self.dobotPlating.gripper.gripperClose();
 
     def stopProcess(self):
-        print("Inside sp");
         self.root.quit();
 
     def popup(self):
-        print("Inside po");
         self.toplevel = Toplevel()
         self.toplevel.geometry("300x75+500+500");
         self.label1 = Label(self.toplevel, text="BRING ROBOT TO HOME POSITION", height=0, width=100)
@@ -244,13 +241,14 @@ class PlatingGUI():
 
     def okpressed(self):
         self.toplevel.destroy();
-        time.sleep(1);
-        self.current_status.set('Running Process..');
+#        current_status_string = 'Running Process..';
         self.root.update_idletasks()
+        time.sleep(1);
         self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, ());
     
     def __del__(self):
-        self.processThread.exit();
+        if self.processThread is not None:
+            self.processThread.exit();
         del self.dobotPlating;
 
 gui = PlatingGUI();

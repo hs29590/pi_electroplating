@@ -15,18 +15,22 @@ from ServoGripper import ServoGripper
 import serial.tools.list_ports
 
 Beakers = [ [0, 0, 0],      #0 dummy beaker for numbering
-            [-140, -165, 5], #1 # -135deg
+#            [-140, -165, 5], #1 # -135deg
+            [-140, -150, 60], #1 # -135deg
             #[-112, -271, 5],  #2 #  -112.6deg
             [-95, -284, 5],  #2 #  -112.6deg
             [0, -211, 5], #3 # -90deg
-            [112, -271, 5], #4 # -67.6deg
-            [149, -149, 5], #5 # -45deg
-            [270, -102, 5],  #6 # -22.6deg
+            # [112, -271, 5], #4 # -67.6deg
+            [119, -261, 5], #4 # -67.6deg
+            #[149, -149, 5], #5 # -45deg
+            [158, -139, 5], #5 # -45deg
+#            [270, -102, 5],  #6 # -22.6deg
+            [278, -92, 5],  #6 # -22.6deg
             [210, 5, 5],    #7 # 0deg
-            [271, 113, 5],  #8 # 22.4deg
+            [271, 113, 60],  #8 # 22.4deg
             [149, 149, 5],   #9 # 45deg
             [112, 270, 5],    #10 # 67.4deg
-            [-189, 223, 5], #11 # 130deg
+            [-189, 223, 60], #11 # 130deg
             [-25, 209, 5]]; #12 #97deg
 
 
@@ -41,8 +45,8 @@ class DobotPlating():
         self.DobotPort = dobotPort;
 
         self.ecRelay = Relay(18);#bcm pin for physical pin 12
-        self.pdRelay = Relay(23);#bcm for physical 16
-        self.rhRelay = Relay(24);#bcm for physical 18
+        self.pdRelay = Relay(24);#bcm for physical 18
+        self.rhRelay = Relay(23);#bcm for physical 16
         self.gripper = ServoGripper(2);
         self.dvc = DigitalVoltControl();
 
@@ -54,17 +58,17 @@ class DobotPlating():
         self.dobot_interface.set_speed()
         self.dobot_interface.set_playback_config()
 
-        self.z_up = 60
-        self.z_down = 0
-        self.RH_Voltage = 2.8;
-        self.PD_Voltage = 1.8;
-        self.EC_Voltage = 1.2;
+        self.z_up = 80
+        self.z_down = -65
+        self.RH_Voltage = 2.5;
+        self.PD_Voltage = 1.9;
+        self.EC_Voltage = 4.8;
         
         self.home_xyz = [215, 0, 100];
                     
         time.sleep(1)
 
-        self.move_xy(self.home_xyz[0], self.home_xyz[1], self.home_xyz[2]);
+        self.move_xy(self.home_xyz[0], self.home_xyz[1], self.home_xyz[2], 0.3);
 
     def move_xy(self,x,y,z,duration = 2):
         self.dobot_interface.send_absolute_position(x, y, z, 0);  #MOVL
@@ -232,19 +236,20 @@ class PlatingGUI():
         self.root.quit();
 
     def popup(self):
-        self.toplevel = Toplevel()
-        self.toplevel.geometry("300x75+500+500");
-        self.label1 = Label(self.toplevel, text="BRING ROBOT TO HOME POSITION", height=0, width=100)
-        self.label1.pack(padx=5)
-        self.but1 = Button(self.toplevel, text="OK", command=self.okpressed);
-        self.but1.pack(pady=5);
-
-    def okpressed(self):
-        self.toplevel.destroy();
-#        current_status_string = 'Running Process..';
-        self.root.update_idletasks()
-        time.sleep(1);
         self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, ());
+#self.toplevel = Toplevel()
+#       self.toplevel.geometry("300x75+500+500");
+#       self.label1 = Label(self.toplevel, text="BRING ROBOT TO HOME POSITION", height=0, width=100)
+#       self.label1.pack(padx=5)
+#       self.but1 = Button(self.toplevel, text="Start", command=self.okpressed);
+#       self.but1.pack(pady=5);
+
+#   def okpressed(self):
+#       self.toplevel.destroy();
+#        current_status_string = 'Running Process..';
+#       self.root.update_idletasks()
+#       time.sleep(1);
+#       self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, ());
     
     def __del__(self):
         if self.processThread is not None:

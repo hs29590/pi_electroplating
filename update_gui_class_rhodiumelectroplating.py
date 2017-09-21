@@ -7,10 +7,10 @@ import ttk
 import thread
 #from Tkinter import ttk
 
-#from DobotSerialInterface import DobotSerialInterface
-#from DigitalVoltControl import DigitalVoltControl
-#from Relay import Relay
-#from ServoGripper import ServoGripper
+from DobotSerialInterface import DobotSerialInterface
+from DigitalVoltControl import DigitalVoltControl
+from Relay import Relay
+from ServoGripper import ServoGripper
 
 import serial.tools.list_ports
 
@@ -63,9 +63,9 @@ class DobotPlating():
 
         self.z_up = 80
         self.z_down = -65
-        self.RH_Voltage = 2.5;
-        self.PD_Voltage = 1.9;
-        self.EC_Voltage = 4.8;
+        #self.RH_Voltage = 2.5;
+        #self.PD_Voltage = 1.9;
+        #self.EC_Voltage = 4.8;
         
         self.home_xyz = [215, 0, 100];
                     
@@ -73,7 +73,11 @@ class DobotPlating():
         
         global global_status
         global_status = "Rh Electroplating";
+
+
+    def move_home(self):
         self.move_xy(self.home_xyz[0], self.home_xyz[1], self.home_xyz[2], 0.3);
+        
 
     def move_xy(self,x,y,z,duration = 2):
         self.dobot_interface.send_absolute_position(x, y, z, 0);  #MOVL
@@ -115,7 +119,7 @@ class DobotPlating():
         self.shake(Beakers[id][0], Beakers[id][1], self.z_up, 1);
      
  
-    def startProcess(self):
+    def startProcess(self, EC_Voltage, PD_Voltage, RH_Voltage):
         global process_running
         process_running = True;
         global global_status
@@ -126,7 +130,7 @@ class DobotPlating():
         self.move_angles(-90, 30, 10);
         self.move_angles(-106, 30, 10);
         self.move_angles(-132, 30, 10);
-        self.dvc.setVoltage(self.EC_Voltage);
+        self.dvc.setVoltage(EC_Voltage);
         self.up_down_beaker(1);
         
         #2
@@ -163,7 +167,7 @@ class DobotPlating():
         global_status = "Step 8: Pd Solution"
         self.move_angles(5, 30, 20);
         self.move_angles(25, 30, 20);
-        self.dvc.setVoltage(self.PD_Voltage);
+        self.dvc.setVoltage(PD_Voltage);
         self.up_down_beaker(8);
         
         #9
@@ -182,7 +186,7 @@ class DobotPlating():
         self.move_angles(100, 20, 20);
         self.move_angles(120, 20, 20);
         self.move_angles(130, 20, 20);
-        self.dvc.setVoltage(self.RH_Voltage);
+        self.dvc.setVoltage(RH_Voltage);
         self.up_down_beaker(11);
         
         #12
@@ -195,7 +199,8 @@ class DobotPlating():
         self.move_angles(60, 20, 10);
         self.move_angles(30, 20, 10);
         self.move_angles(0, 20, 10);
-        self.move_xy(self.home_xyz[0], self.home_xyz[1], self.home_xyz[2]);
+
+        self.move_home()
         global_status = "Done.."
         process_running = False;
         print("\n DONE \n");
@@ -274,13 +279,13 @@ class PlatingGUI():
 
         ttk.Button(self.mainframe, text="Gripper Open", style='my.TButton', command=self.gripperOpen, width=16).grid(column=3, row=2, sticky=W)
         ttk.Button(self.mainframe, text="Gripper Close", style='my.TButton', command=self.gripperClose, width=16).grid(column=3, row=3, sticky=W)
-        ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(column=1, row=2, sticky=W)
+        ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(column=1, row=2, sticky=W )
         ttk.Button(self.mainframe, text="Stop", style='my.TButton', command=self.stopProcess, width=16).grid(column=1, row=3, sticky=W)
   
         self.root.after(1, self.initialPopup);
         self.root.after(1000, self.updateLabel);
 
-#        self.dobotPlating = DobotPlating();
+        self.dobotPlating = DobotPlating();
 
     def initialPopup(self):
         self.toplevel = Toplevel()
@@ -294,6 +299,7 @@ class PlatingGUI():
  
     def okpressed(self):
         self.readyToStart = True;
+        self.dobotPlating.move_home();
         self.toplevel.destroy();
 
     def ec_change(self,*args):
@@ -346,7 +352,7 @@ class PlatingGUI():
     def popup(self):
         global process_running
         if(not process_running and self.readyToStart):
-            self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, ());
+            self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage,));
     
     def __del__(self):
         if self.processThread is not None:

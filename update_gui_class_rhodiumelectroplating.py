@@ -290,7 +290,14 @@ class PlatingGUI():
     def initialPopup(self):
         self.toplevel = Toplevel()
         self.toplevel.wm_attributes("-topmost", 1) 
-        self.toplevel.geometry("300x75+500+500");
+        framew = 300; # root w
+        frameh = 75; # root h
+        screenw = self.root.winfo_screenwidth();
+        screenh = self.root.winfo_screenheight();
+        posx = (screenw/2) - (framew/2);
+        posy = (screenh/2) - (frameh/2);
+        self.toplevel.geometry( "%dx%d+%d+%d" % (framew,frameh,posx,posy))
+        #self.toplevel.geometry("300x75+500+500");
         self.label1 = Label(self.toplevel, text="BRING ROBOT TO HOME POSITION", height=0, width=100)
         self.label1.pack(padx=5)
         self.but1 = Button(self.toplevel, text="OK", command=self.okpressed);

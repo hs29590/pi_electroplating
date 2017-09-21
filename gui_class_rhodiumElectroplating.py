@@ -14,6 +14,8 @@ from ServoGripper import ServoGripper
 
 import serial.tools.list_ports
 
+global_status = "Running";
+
 Beakers = [ [0, 0, 0],      #0 dummy beaker for numbering
 #            [-140, -165, 5], #1 # -135deg
             [-140, -150, 60], #1 # -135deg
@@ -67,7 +69,9 @@ class DobotPlating():
         self.home_xyz = [215, 0, 100];
                     
         time.sleep(1)
-
+        
+        global global_status
+        global_status = "Rh Electroplating";
         self.move_xy(self.home_xyz[0], self.home_xyz[1], self.home_xyz[2], 0.3);
 
     def move_xy(self,x,y,z,duration = 2):
@@ -111,7 +115,8 @@ class DobotPlating():
      
  
     def startProcess(self):
-            
+        global global_status
+        global_status = "Step 1: EC"
         #1
         self.move_angles(-40, 30, 10);
         self.move_angles(-60, 30, 10);
@@ -122,44 +127,54 @@ class DobotPlating():
         self.up_down_beaker(1);
         
         #2
+        global_status = "Step 2: Dragout"
         self.move_angles(-112, 30, 10);
         self.up_down_beaker(2);
         
         #3
+        global_status = "Step 3: Water"
         self.move_angles(-90, 30, 10);
         self.up_down_beaker(3);
 
         #4
+        global_status = "Step 4: Activation"
         self.move_angles(-67, 30, 10);
         self.up_down_beaker(4);
         
         #5
+        global_status = "Step 5: Water"
         self.move_angles(-45, 30, 20);
         self.up_down_beaker(5);
 
         #6
+        global_status = "Step 6: Water"
         self.move_angles(-25, 30, 20);    
         self.up_down_beaker(6);
         
         #7
+        global_status = "Step 7: Water"
         self.move_angles(5, 30, 20);
         self.up_down_beaker(7);
 
         #8
+        global_status = "Step 8: Pd Solution"
         self.move_angles(5, 30, 20);
         self.move_angles(25, 30, 20);
         self.dvc.setVoltage(self.PD_Voltage);
         self.up_down_beaker(8);
         
         #9
+        global_status = "Step 9: Pd Dragout"
         self.move_angles(45, 20, 20);
         self.up_down_beaker(9);
         
         #10
+        global_status = "Step 10: Water"
         self.move_angles(67, 20, 20);
         self.up_down_beaker(10);
         
         #11
+        global_status = "Step 11: Rh Solution"
         self.move_angles(89, 20, 20);
         self.move_angles(100, 20, 20);
         self.move_angles(120, 20, 20);
@@ -168,6 +183,7 @@ class DobotPlating():
         self.up_down_beaker(11);
         
         #12
+        global_status = "Step 12: Rh Dragout"
         self.move_angles(120, 30, 10);
         self.move_angles(97, 30, 10);
         self.up_down_beaker(12);
@@ -177,6 +193,7 @@ class DobotPlating():
         self.move_angles(30, 20, 10);
         self.move_angles(0, 20, 10);
         self.move_xy(self.home_xyz[0], self.home_xyz[1], self.home_xyz[2]);
+        global_status = "Done.."
         print("\n DONE \n");
         
     def __del__(self):
@@ -212,14 +229,26 @@ class PlatingGUI():
         self.buttonStyle.configure('my.TButton', font=('Helvetica', 18))
         
         self.l = ttk.Label(self.root, textvariable=self.current_status, font=('Helvetica',18));
-        self.l.place(relx=0.35, rely=0.3, anchor='sw')
+        self.l.place(relx=0.35, rely=0.3, anchor='center')
 
         ttk.Button(self.mainframe, text="Gripper Open", style='my.TButton', command=self.gripperOpen, width=16).grid(column=3, row=1, sticky=W)
         ttk.Button(self.mainframe, text="Gripper Close", style='my.TButton', command=self.gripperClose, width=16).grid(column=3, row=3, sticky=W)
         ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(column=1, row=1, sticky=W)
         ttk.Button(self.mainframe, text="Stop", style='my.TButton', command=self.stopProcess, width=16).grid(column=1, row=3, sticky=W)
-   
+  
+        self.root.after(1000, self.updateLabel);
+
         self.dobotPlating = DobotPlating();
+
+    
+    def updateLabel(self):
+        global global_status;
+        self.current_status.set(global_status);
+        self.l.config(textvariable=self.current_status);
+        self.l.place(x=90, y=5)
+        self.l.update_idletasks();
+        self.root.update_idletasks();
+        self.root.after(500, self.updateLabel);
 
     def gripperOpen(self):
 #        current_status_string = 'Gripper Open';

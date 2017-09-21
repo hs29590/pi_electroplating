@@ -1,16 +1,18 @@
--> Main Switch On: Powers on Circuit, Robot and Rectifier
--> Monitor On
--> Rectifier switch on
--> Robot to home position
-    -> Robot main Switch on (Black Control Box)
-    -> Robot Reset Button, Twice (Black Control Box)
--> Desktop Icon: Plating, double click
-    -> Wait till bottle disappears
--> Gripper open
-    -> Install Jig / Load Pieces
--> Gripper Close
--> Press Start
--> Display shows steps
--> Display shows "Done.." when finished
--> Gripper Open
-    -> unload pieces
+1) -> Main Switch On: Powers on Circuit, Robot and Rectifier
+2) -> Monitor On
+3) -> Rectifier switch on
+4) -> Robot to home position
+        i) -> Robot main Switch on (Black Control Box)
+        ii) -> Robot Reset Button, Twice (Black Control Box)
+5) -> Desktop Icon: Plating, double click
+        i) -> Wait till bottle disappears
+6) -> Gripper open
+        i) -> Install Jig / Load Pieces
+7) -> Gripper Close
+8) -> Press Start
+9) -> Display shows steps
+10) -> Display shows "Done.." when finished
+11) -> Gripper Open
+        i) -> unload pieces
+
+For more pieces, repeat Steps 6 to 11

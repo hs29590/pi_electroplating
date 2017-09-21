@@ -15,6 +15,7 @@ from ServoGripper import ServoGripper
 import serial.tools.list_ports
 
 global_status = "Running";
+process_running = False;
 
 Beakers = [ [0, 0, 0],      #0 dummy beaker for numbering
 #            [-140, -165, 5], #1 # -135deg
@@ -115,6 +116,8 @@ class DobotPlating():
      
  
     def startProcess(self):
+        global process_running
+        process_running = True;
         global global_status
         global_status = "Step 1: EC"
         #1
@@ -194,6 +197,7 @@ class DobotPlating():
         self.move_angles(0, 20, 10);
         self.move_xy(self.home_xyz[0], self.home_xyz[1], self.home_xyz[2]);
         global_status = "Done.."
+        process_running = False;
         print("\n DONE \n");
         
     def __del__(self):
@@ -251,34 +255,27 @@ class PlatingGUI():
         self.root.after(500, self.updateLabel);
 
     def gripperOpen(self):
-#        current_status_string = 'Gripper Open';
-#        self.root.update_idletasks()
-        self.dobotPlating.gripper.gripperOpen();
+        global process_running
+        if(not process_running):
+            global global_status;  
+            global_status = "Gripper Open";
+            self.dobotPlating.gripper.gripperOpen();
 
 
     def gripperClose(self):
-#        current_status_string = 'Gripper Close';
-        self.root.update_idletasks()
-        self.dobotPlating.gripper.gripperClose();
+        global process_running
+        if(not process_running):
+            global global_status;  
+            global_status = "Gripper Close";
+            self.dobotPlating.gripper.gripperClose();
 
     def stopProcess(self):
         self.root.quit();
 
     def popup(self):
-        self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, ());
-#self.toplevel = Toplevel()
-#       self.toplevel.geometry("300x75+500+500");
-#       self.label1 = Label(self.toplevel, text="BRING ROBOT TO HOME POSITION", height=0, width=100)
-#       self.label1.pack(padx=5)
-#       self.but1 = Button(self.toplevel, text="Start", command=self.okpressed);
-#       self.but1.pack(pady=5);
-
-#   def okpressed(self):
-#       self.toplevel.destroy();
-#        current_status_string = 'Running Process..';
-#       self.root.update_idletasks()
-#       time.sleep(1);
-#       self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, ());
+        global process_running
+        if(not process_running):
+            self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, ());
     
     def __del__(self):
         if self.processThread is not None:

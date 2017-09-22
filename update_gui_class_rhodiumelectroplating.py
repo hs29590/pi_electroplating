@@ -262,14 +262,17 @@ class PlatingGUI():
         ecpopupMenu = OptionMenu(self.mainframe, self.ecvar, *ecchoices)
         Label(self.mainframe, text="EC Voltage").grid(row = 7, column = 1, padx=5, pady=5)
         ecpopupMenu.grid(row = 8, column =1)
+        ecpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         pdpopupMenu = OptionMenu(self.mainframe, self.pdvar, *pdchoices)
         Label(self.mainframe, text="Pd Voltage").grid(row = 7, column = 2, padx=5, pady=5)
         pdpopupMenu.grid(row = 8, column =2)
+        pdpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         rhpopupMenu = OptionMenu(self.mainframe, self.rhvar, *rhchoices)
         Label(self.mainframe, text="Rh Voltage").grid(row = 7, column = 3, padx=5, pady=5)
         rhpopupMenu.grid(row = 8, column =3)
+        rhpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         # link function to change dropdown
         self.ecvar.trace('w', self.ec_change)
@@ -277,15 +280,33 @@ class PlatingGUI():
         self.rhvar.trace('w', self.rh_change)
 
 
-        ttk.Button(self.mainframe, text="Gripper Open", style='my.TButton', command=self.gripperOpen, width=16).grid(column=3, row=2, sticky=W)
-        ttk.Button(self.mainframe, text="Gripper Close", style='my.TButton', command=self.gripperClose, width=16).grid(column=3, row=3, sticky=W)
+        ttk.Button(self.mainframe, text="Gripper Open", style='my.TButton', command=self.gripperOpen, width=16).grid(column=2, columnspan=2, row=2, sticky=W)
+        ttk.Button(self.mainframe, text="Gripper Close", style='my.TButton', command=self.gripperClose, width=16).grid(column=2, columnspan=2, row=3, sticky=W)
         ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(column=1, row=2, sticky=W )
         ttk.Button(self.mainframe, text="Stop", style='my.TButton', command=self.stopProcess, width=16).grid(column=1, row=3, sticky=W)
   
         self.root.after(1, self.initialPopup);
         self.root.after(1000, self.updateLabel);
-
+    
         self.dobotPlating = DobotPlating();
+    
+    def dropdownopen(self, event):
+        global process_running
+        if(process_running):
+            self.toplevel = Toplevel()
+            self.toplevel.wm_attributes("-topmost", 1) 
+            framew = 300; # root w
+            frameh = 75; # root h
+            screenw = self.root.winfo_screenwidth();
+            screenh = self.root.winfo_screenheight();
+            posx = (screenw/2) - (framew/2);
+            posy = (screenh/2) - (frameh/2);
+            self.toplevel.geometry( "%dx%d+%d+%d" % (framew,frameh,posx,posy))
+            self.label1 = Label(self.toplevel, text="Can't change value when process is running..", height=0, width=100)
+            self.label1.pack(padx=5)
+            self.but1 = Button(self.toplevel, text="OK", command=self.dropdownokpressed);
+            self.but1.pack(pady=5);
+
 
     def initialPopup(self):
         self.toplevel = Toplevel()
@@ -303,7 +324,9 @@ class PlatingGUI():
         self.but1 = Button(self.toplevel, text="OK", command=self.okpressed);
         self.but1.pack(pady=5);
         
- 
+    def dropdownokpressed(self):
+        self.toplevel.destroy();
+
     def okpressed(self):
         self.readyToStart = True;
         self.dobotPlating.move_home();

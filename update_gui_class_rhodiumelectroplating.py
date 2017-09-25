@@ -88,7 +88,7 @@ class DobotPlating():
         self.dobot_interface.send_absolute_angles(base, rear, front, 0);
         time.sleep(duration);
 
-    def shake(self,x, y, z, shakeDuration):
+    def shake(self,x, y, z, shakeDuration, dispStr):
         t_end = time.time() + shakeDuration;
         while time.time() < t_end:
             self.move_xy(x, y, z + 10, 0.3);
@@ -99,7 +99,9 @@ class DobotPlating():
         print ("Doing beaker %d now" % (id));
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up);
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_down);
-        
+        dispStr = 'Step ' + str(id) + ': ';
+
+
         if(id == 1):
             self.ecRelay.on();
         elif(id == 8):
@@ -130,7 +132,11 @@ class DobotPlating():
         self.move_angles(-90, 30, 10);
         self.move_angles(-106, 30, 10);
         self.move_angles(-132, 30, 10);
-        self.dvc.setVoltage(EC_Voltage);
+        if(EC_Voltage == 5.6):
+            self.dvc.setMaxVoltage();
+        else:
+            self.dvc.setVoltage(EC_Voltage);
+        #ecchoices = { '4.0','4.5','4.7', '5.6'}
         self.up_down_beaker(1);
         
         #2
@@ -247,31 +253,32 @@ class PlatingGUI():
         self.pdvar = StringVar(self.root)
         self.rhvar = StringVar(self.root)
         
-        ecchoices = { '4.0','4.5','4.7'}
-        pdchoices = { '1.5','1.8','2.0','2.2','2.5'}
-        rhchoices = { '1.5','1.8','2.0','2.2','2.5'}
+        #ecchoices = { '4.0','4.5','4.7', '5.6'}
+        ecchoices = {'5.6'}
+        pdchoices = { '1.8','1.9','2.0','2.1'}
+        rhchoices = { '2.5','2.6','2.75','2.85','3.0'}
         
-        self.ecvar.set('4.7') # set the default option
-        self.pdvar.set('1.8')
+        self.ecvar.set('5.6') # set the default option
+        self.pdvar.set('1.9')
         self.rhvar.set('2.5')
         
         self.ecVoltage = float(self.ecvar.get());
         self.pdVoltage = float(self.pdvar.get());
         self.rhVoltage = float(self.rhvar.get());
         
-        ecpopupMenu = OptionMenu(self.mainframe, self.ecvar, *ecchoices)
-        Label(self.mainframe, text="EC Voltage").grid(row = 7, column = 1, padx=5, pady=5)
-        ecpopupMenu.grid(row = 8, column =1)
-        ecpopupMenu.bind('<Button-1>', self.dropdownopen)
+        #ecpopupMenu = OptionMenu(self.mainframe, self.ecvar, *ecchoices)
+        #Label(self.mainframe, text="EC Voltage").grid(row = 7, column = 1, padx=5, pady=5, sticky=E)
+        #ecpopupMenu.grid(row = 9, column =1, padx=5, pady=5, sticky=E)
+        #ecpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         pdpopupMenu = OptionMenu(self.mainframe, self.pdvar, *pdchoices)
-        Label(self.mainframe, text="Pd Voltage").grid(row = 7, column = 2, padx=5, pady=5)
-        pdpopupMenu.grid(row = 8, column =2)
+        Label(self.mainframe, text="Pd Voltage").grid(row = 7, column = 1, padx=5, pady=5, sticky=E)
+        pdpopupMenu.grid(row = 8, column =1, padx=5, pady=5, sticky=E)
         pdpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         rhpopupMenu = OptionMenu(self.mainframe, self.rhvar, *rhchoices)
-        Label(self.mainframe, text="Rh Voltage").grid(row = 7, column = 3, padx=5, pady=5)
-        rhpopupMenu.grid(row = 8, column =3)
+        Label(self.mainframe, text="Rh Voltage").grid(row = 7, column = 2, padx=5, pady=5, sticky=W)
+        rhpopupMenu.grid(row = 8, column =2, padx=5, pady=5, sticky=W)
         rhpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         # link function to change dropdown

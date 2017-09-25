@@ -45,6 +45,9 @@ class DigitalVoltControl():
 
         GPIO.output(self.SPI_CS_PIN, True)
  
+    def setMaxVoltage(self):
+        self.set_value(5);#5 is equivalent to 5.66V in terms of experiments.
+
     def setVoltage(self,desiredV):
         if(desiredV < self.minV):
             print "Desired V is less than min V";

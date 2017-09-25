@@ -89,27 +89,38 @@ class DobotPlating():
         time.sleep(duration);
 
     def shake(self,x, y, z, shakeDuration, dispStr):
+        global global_status;
         t_end = time.time() + shakeDuration;
-        while time.time() < t_end:
+        tdiff = t_end - time.time();
+        while tdiff > 0:
+            if(dispStr is not None):
+                global_status = dispStr + str(int(tdiff)) + "s"
             self.move_xy(x, y, z + 10, 0.3);
             self.move_xy(x, y, z - 10, 0.3);
+            tdiff = t_end - time.time();
         
     def up_down_beaker(self,id):
 
         print ("Doing beaker %d now" % (id));
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up);
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_down);
-        dispStr = 'Step ' + str(id) + ': ';
+        dispStr = "Step " + str(id) + ": ";
 
 
         if(id == 1):
             self.ecRelay.on();
+            dispStr = dispStr + "EC "
         elif(id == 8):
             self.pdRelay.on();
+            dispStr = dispStr + "Pd Solution "
         elif(id == 11):
             self.rhRelay.on();
+            dispStr = dispStr + "Rh Solution "
             
-        self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][2]); #x, y, z and shake_duration
+        if(id == 1 or id == 8 or id == 11):
+            self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][2], dispStr); #x, y, z and shake_duration
+        else:    
+            self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][2], None); #x, y, z and shake_duration
         
         self.ecRelay.off();
         self.pdRelay.off();
@@ -118,7 +129,7 @@ class DobotPlating():
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up);
         
         #shake to drop the excess drops
-        self.shake(Beakers[id][0], Beakers[id][1], self.z_up, 1);
+        self.shake(Beakers[id][0], Beakers[id][1], self.z_up, 1, None);
      
  
     def startProcess(self, EC_Voltage, PD_Voltage, RH_Voltage):
@@ -363,7 +374,8 @@ class PlatingGUI():
         global global_status;
         self.current_status.set(global_status);
         self.l.config(textvariable=self.current_status);
-        self.l.place(x=90, y=5)
+        #self.l.place(x=90, y=5)
+        self.l.grid(row=1, column=1, columnspan=3, sticky=N)
         self.l.update_idletasks();
         self.root.update_idletasks();
         self.root.after(500, self.updateLabel);

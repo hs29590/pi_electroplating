@@ -33,7 +33,7 @@ Beakers = [ [0, 0, 0],      #0 dummy beaker for numbering
             [271, 113, 60],  #8 # 22.4deg
             [149, 149, 5],   #9 # 45deg
             [112, 270, 5],    #10 # 67.4deg
-            [-189, 223, 60], #11 # 130deg
+            [-189, 223, 20], #11 # 130deg
             [-25, 209, 5]]; #12 #97deg
 
 
@@ -72,7 +72,7 @@ class DobotPlating():
         time.sleep(1)
         
         global global_status
-        global_status = "Rh Electroplating";
+        global_status = "Re-Dip: Rh Electroplating";
 
 
     def move_home(self):
@@ -136,7 +136,7 @@ class DobotPlating():
         global process_running
         process_running = True;
         global global_status
-        global_status = "Step 1: EC"
+        global_status = "Re-Dip Step 1: EC"
         #1
         self.move_angles(-40, 30, 10);
         self.move_angles(-60, 30, 10);
@@ -151,54 +151,54 @@ class DobotPlating():
         self.up_down_beaker(1);
         
         #2
-        global_status = "Step 2: Dragout"
+        global_status = "Re-Dip Step 2: Dragout"
         self.move_angles(-112, 30, 10);
         self.up_down_beaker(2);
         
         #3
-        global_status = "Step 3: Water"
+        global_status = "Re-Dip Step 3: Water"
         self.move_angles(-90, 30, 10);
         self.up_down_beaker(3);
 
         #4
-        global_status = "Step 4: Activation"
+        global_status = "Re-Dip Step 4: Activation"
         self.move_angles(-67, 30, 10);
         self.up_down_beaker(4);
         
         #5
-        global_status = "Step 5: Water"
+        global_status = "Re-Dip Step 5: Water"
         self.move_angles(-45, 30, 20);
         self.up_down_beaker(5);
 
         #6
-        global_status = "Step 6: Water"
+        global_status = "Re-Dip Step 6: Water"
         self.move_angles(-25, 30, 20);    
         self.up_down_beaker(6);
         
         #7
-        global_status = "Step 7: Water"
+        global_status = "Re-Dip Step 7: Water"
         self.move_angles(5, 30, 20);
         self.up_down_beaker(7);
 
         #8
-        global_status = "Step 8: Pd Solution"
-        self.move_angles(5, 30, 20);
+#global_status = "Re-Dip Step 8: Pd Solution"
+#        self.move_angles(5, 30, 20);
         self.move_angles(25, 30, 20);
-        self.dvc.setVoltage(PD_Voltage);
-        self.up_down_beaker(8);
+#       self.dvc.setVoltage(PD_Voltage);
+#       self.up_down_beaker(8);
         
         #9
-        global_status = "Step 9: Pd Dragout"
+#       global_status = "Step 9: Pd Dragout"
         self.move_angles(45, 20, 20);
-        self.up_down_beaker(9);
+#       self.up_down_beaker(9);
         
         #10
-        global_status = "Step 10: Water"
+#       global_status = "Step 10: Water"
         self.move_angles(67, 20, 20);
-        self.up_down_beaker(10);
+#       self.up_down_beaker(10);
         
         #11
-        global_status = "Step 11: Rh Solution"
+        global_status = "Re-Dip Step 8: Rh Solution"
         self.move_angles(89, 20, 20);
         self.move_angles(100, 20, 20);
         self.move_angles(120, 20, 20);
@@ -207,13 +207,13 @@ class DobotPlating():
         self.up_down_beaker(11);
         
         #12
-        global_status = "Step 12: Rh Dragout"
+        global_status = "Re-Dip Step 9: Rh Dragout"
         self.move_angles(120, 30, 10);
         self.move_angles(97, 30, 10);
         self.up_down_beaker(12);
         
         #13 #repeat of beaker 10
-        global_status = "Step 13: Water"
+        global_status = "Re-Dip Step 10: Water"
         self.move_angles(67, 20, 20);
         self.up_down_beaker(10);
 
@@ -223,7 +223,7 @@ class DobotPlating():
         self.move_angles(0, 20, 10);
 
         self.move_home()
-        global_status = "Done.."
+        global_status = "Re-Dip Done.."
         process_running = False;
         print("\n DONE \n");
         
@@ -238,7 +238,7 @@ class DobotPlating():
 class PlatingGUI():
     def __init__(self):
         self.root = Tk()
-        self.root.title("Rh Electroplating")
+        self.root.title("Re-Dip Rh Electroplating")
         
         self.readyToStart = False;
         
@@ -251,7 +251,7 @@ class PlatingGUI():
         self.root.geometry( "%dx%d+%d+%d" % (framew,frameh,posx,posy))
 
         self.current_status = StringVar();
-        self.current_status.set('Rh Electroplating');
+        self.current_status.set('Re-Dip Rh Electroplating');
 
         self.mainframe = ttk.Frame(self.root, padding="10 10 30 30", height=300, width=550)
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
@@ -305,7 +305,7 @@ class PlatingGUI():
 
         ttk.Button(self.mainframe, text="Gripper Open", style='my.TButton', command=self.gripperOpen, width=16).grid(column=2, columnspan=2, row=2, sticky=W)
         ttk.Button(self.mainframe, text="Gripper Close", style='my.TButton', command=self.gripperClose, width=16).grid(column=2, columnspan=2, row=3, sticky=W)
-        ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(column=1, row=2, sticky=W )
+        ttk.Button(self.mainframe, text="Start Re-Dip", style='my.TButton',command=self.popup, width=16).grid(column=1, row=2, sticky=W )
         ttk.Button(self.mainframe, text="Stop", style='my.TButton', command=self.stopProcess, width=16).grid(column=1, row=3, sticky=W)
   
         self.root.after(1, self.initialPopup);

@@ -118,7 +118,10 @@ class DobotPlating():
             dispStr = dispStr + "Rh Solution "
             
         if(id == 1 or id == 8 or id == 11):
-            self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][2], dispStr); #x, y, z and shake_duration
+            if(id == 11):
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down - 20, Beakers[id][2], dispStr); #x, y, z and shake_duration
+            else:
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][2], dispStr); #x, y, z and shake_duration
         else:    
             self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][2], None); #x, y, z and shake_duration
         
@@ -287,10 +290,10 @@ class PlatingGUI():
         #ecpopupMenu.grid(row = 9, column =1, padx=5, pady=5, sticky=E)
         #ecpopupMenu.bind('<Button-1>', self.dropdownopen)
         
-        pdpopupMenu = OptionMenu(self.mainframe, self.pdvar, *pdchoices)
-        Label(self.mainframe, text="Pd Voltage").grid(row = 7, column = 1, padx=5, pady=5, sticky=E)
-        pdpopupMenu.grid(row = 8, column =1, padx=5, pady=5, sticky=E)
-        pdpopupMenu.bind('<Button-1>', self.dropdownopen)
+#        pdpopupMenu = OptionMenu(self.mainframe, self.pdvar, *pdchoices)
+#        Label(self.mainframe, text="Pd Voltage").grid(row = 7, column = 1, padx=5, pady=5, sticky=E)
+#        pdpopupMenu.grid(row = 8, column =1, padx=5, pady=5, sticky=E)
+#        pdpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         rhpopupMenu = OptionMenu(self.mainframe, self.rhvar, *rhchoices)
         Label(self.mainframe, text="Rh Voltage").grid(row = 7, column = 2, padx=5, pady=5, sticky=W)

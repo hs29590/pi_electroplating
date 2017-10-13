@@ -72,7 +72,7 @@ class DobotPlating():
         time.sleep(1)
         
         global global_status
-        global_status = "Rh Electroplating";
+        global_status = "White-Gold: Rh Electroplating";
 
 
     def move_home(self):
@@ -82,14 +82,11 @@ class DobotPlating():
     def move_xy(self,x,y,z,duration = 2):
         self.dobot_interface.send_absolute_position(x, y, z, 0);  #MOVL
         time.sleep(duration);
-        print self.dobot_interface.current_status.position
         
 
     def move_angles(self, base, rear, front, duration = 2):
         self.dobot_interface.send_absolute_angles(base, rear, front, 0);
         time.sleep(duration);
-        print self.dobot_interface.current_status.position
-
 
     def shake(self,x, y, z, shakeDuration, dispStr):
         global global_status;
@@ -142,7 +139,7 @@ class DobotPlating():
         global process_running
         process_running = True;
         global global_status
-        global_status = "Step 1: EC"
+        global_status = "White-Gold Step 1: EC"
         #1
         self.move_angles(-40, 30, 10);
         self.move_angles(-60, 30, 10);
@@ -157,54 +154,54 @@ class DobotPlating():
         self.up_down_beaker(1);
         
         #2
-        global_status = "Step 2: Dragout"
+        global_status = "White-Gold Step 2: Dragout"
         self.move_angles(-112, 30, 10);
         self.up_down_beaker(2);
         
         #3
-        global_status = "Step 3: Water"
+        global_status = "White-Gold Step 3: Water"
         self.move_angles(-90, 30, 10);
         self.up_down_beaker(3);
 
         #4
-        global_status = "Step 4: Activation"
+        global_status = "White-Gold Step 4: Activation"
         self.move_angles(-67, 30, 10);
         self.up_down_beaker(4);
         
         #5
-        global_status = "Step 5: Water"
+        global_status = "White-Gold Step 5: Water"
         self.move_angles(-45, 30, 20);
         self.up_down_beaker(5);
 
         #6
-        global_status = "Step 6: Water"
+        global_status = "White-Gold Step 6: Water"
         self.move_angles(-25, 30, 20);    
         self.up_down_beaker(6);
         
         #7
-        global_status = "Step 7: Water"
+        global_status = "White-Gold Step 7: Water"
         self.move_angles(5, 30, 20);
         self.up_down_beaker(7);
 
         #8
-        global_status = "Step 8: Pd Solution"
-        self.move_angles(5, 30, 20);
+#global_status = "White-Gold Step 8: Pd Solution"
+#        self.move_angles(5, 30, 20);
         self.move_angles(25, 30, 20);
-        self.dvc.setVoltage(PD_Voltage);
-        self.up_down_beaker(8);
+#       self.dvc.setVoltage(PD_Voltage);
+#       self.up_down_beaker(8);
         
         #9
-        global_status = "Step 9: Pd Dragout"
+#       global_status = "Step 9: Pd Dragout"
         self.move_angles(45, 20, 20);
-        self.up_down_beaker(9);
+#       self.up_down_beaker(9);
         
         #10
-        global_status = "Step 10: Water"
+#       global_status = "Step 10: Water"
         self.move_angles(67, 20, 20);
-        self.up_down_beaker(10);
+#       self.up_down_beaker(10);
         
         #11
-        global_status = "Step 11: Rh Solution"
+        global_status = "White-Gold Step 8: Rh Solution"
         self.move_angles(89, 20, 20);
         self.move_angles(100, 20, 20);
         self.move_angles(120, 20, 20);
@@ -213,13 +210,13 @@ class DobotPlating():
         self.up_down_beaker(11);
         
         #12
-        global_status = "Step 12: Rh Dragout"
+        global_status = "White-Gold Step 9: Rh Dragout"
         self.move_angles(120, 30, 10);
         self.move_angles(97, 30, 10);
         self.up_down_beaker(12);
         
         #13 #repeat of beaker 10
-        global_status = "Step 13: Water"
+        global_status = "White-Gold Step 10: Water"
         self.move_angles(67, 20, 20);
         self.up_down_beaker(10);
 
@@ -229,7 +226,7 @@ class DobotPlating():
         self.move_angles(0, 20, 10);
 
         self.move_home()
-        global_status = "Done.."
+        global_status = "White-Gold Done.."
         process_running = False;
         print("\n DONE \n");
         
@@ -244,7 +241,7 @@ class DobotPlating():
 class PlatingGUI():
     def __init__(self):
         self.root = Tk()
-        self.root.title("Rh Electroplating")
+        self.root.title("White-Gold Rh Electroplating")
         
         self.readyToStart = False;
         
@@ -257,7 +254,7 @@ class PlatingGUI():
         self.root.geometry( "%dx%d+%d+%d" % (framew,frameh,posx,posy))
 
         self.current_status = StringVar();
-        self.current_status.set('Rh Electroplating');
+        self.current_status.set('White-Gold Rh Electroplating');
 
         self.mainframe = ttk.Frame(self.root, padding="10 10 30 30", height=300, width=550)
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
@@ -274,17 +271,12 @@ class PlatingGUI():
         self.ecvar = StringVar(self.root)
         self.pdvar = StringVar(self.root)
         self.rhvar = StringVar(self.root)
-#self.chosenProcess = StringVar(self.root);
         
         #ecchoices = { '4.0','4.5','4.7', '5.6'}
         ecchoices = {'5.6'}
         pdchoices = { '1.8','1.9','2.0','2.1'}
         rhchoices = { '2.5','2.6','2.75','2.85','3.0'}
-       
-#        self.processChoices = {'Pd-1min, Rh-1min', 'Only Rh-20sec', 'Only Rh-1 min'}
-
-#        self.chosenProcess.set('Pd-1min, Rh-1min');
-
+        
         self.ecvar.set('5.6') # set the default option
         self.pdvar.set('1.9')
         self.rhvar.set('2.5')
@@ -292,22 +284,16 @@ class PlatingGUI():
         self.ecVoltage = float(self.ecvar.get());
         self.pdVoltage = float(self.pdvar.get());
         self.rhVoltage = float(self.rhvar.get());
-#        self.processType = self.chosenProcess.get(); #pd1min, rh1min
         
         #ecpopupMenu = OptionMenu(self.mainframe, self.ecvar, *ecchoices)
         #Label(self.mainframe, text="EC Voltage").grid(row = 7, column = 1, padx=5, pady=5, sticky=E)
         #ecpopupMenu.grid(row = 9, column =1, padx=5, pady=5, sticky=E)
         #ecpopupMenu.bind('<Button-1>', self.dropdownopen)
-
-#        chooseProcessMenu = OptionMenu(self.mainframe, self.chosenProcess, *self.processChoices);
-#        Label(self.mainframe, text="Choose Process").grid(row = 9, column = 2, padx=5, pady=5, sticky=S);
-#        chooseProcessMenu.grid(row=10, column = 2, padx=5, pady=5, sticky=S);
-#        chooseProcessMenu.bind('<Button-1>', self.dropdownopen);
         
-        pdpopupMenu = OptionMenu(self.mainframe, self.pdvar, *pdchoices)
-        Label(self.mainframe, text="Pd Voltage").grid(row = 7, column = 1, padx=5, pady=5, sticky=E)
-        pdpopupMenu.grid(row = 8, column =1, padx=5, pady=5, sticky=E)
-        pdpopupMenu.bind('<Button-1>', self.dropdownopen)
+#pdpopupMenu = OptionMenu(self.mainframe, self.pdvar, *pdchoices)
+#        Label(self.mainframe, text="Pd Voltage").grid(row = 7, column = 1, padx=5, pady=5, sticky=E)
+#        pdpopupMenu.grid(row = 8, column =1, padx=5, pady=5, sticky=E)
+#        pdpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         rhpopupMenu = OptionMenu(self.mainframe, self.rhvar, *rhchoices)
         Label(self.mainframe, text="Rh Voltage").grid(row = 7, column = 2, padx=5, pady=5, sticky=W)
@@ -315,7 +301,6 @@ class PlatingGUI():
         rhpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         # link function to change dropdown
-#        self.chosenProcess.trace('w', self.process_change);
         self.ecvar.trace('w', self.ec_change)
         self.pdvar.trace('w', self.pd_change)
         self.rhvar.trace('w', self.rh_change)
@@ -323,7 +308,7 @@ class PlatingGUI():
 
         ttk.Button(self.mainframe, text="Gripper Open", style='my.TButton', command=self.gripperOpen, width=16).grid(column=2, columnspan=2, row=2, sticky=W)
         ttk.Button(self.mainframe, text="Gripper Close", style='my.TButton', command=self.gripperClose, width=16).grid(column=2, columnspan=2, row=3, sticky=W)
-        ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(column=1, row=2, sticky=W )
+        ttk.Button(self.mainframe, text="Start White-Gold", style='my.TButton',command=self.popup, width=16).grid(column=1, row=2, sticky=W )
         ttk.Button(self.mainframe, text="Stop", style='my.TButton', command=self.stopProcess, width=16).grid(column=1, row=3, sticky=W)
   
         self.root.after(1, self.initialPopup);
@@ -372,11 +357,6 @@ class PlatingGUI():
         self.readyToStart = True;
         self.dobotPlating.move_home();
         self.toplevel.destroy();
-
-#    def process_change(self,*args):
-#        self.processType = self.chosenProcess.get();
-#        print( ' Process changed to: '),
-#        print (self.processType);
 
     def ec_change(self,*args):
         self.ecVoltage = float(self.ecvar.get());
@@ -429,7 +409,7 @@ class PlatingGUI():
     def popup(self):
         global process_running
         if(not process_running and self.readyToStart):
-           self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage,));
+            self.processThread = thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage,));
     
     def __del__(self):
         if self.processThread is not None:

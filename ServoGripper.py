@@ -10,7 +10,7 @@ class ServoGripper():
         self.pwm=GPIO.PWM(self.servoGPIOPin, 50)
         self.pwm.start(0);
         self.openAngle = 160;
-        self.closeAngle = 50;
+        self.closeAngle = 30;
 
     def setOpenAngle(self,openangle):
         self.openAngle = openangle;

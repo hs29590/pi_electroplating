@@ -50,9 +50,9 @@ class DigitalVoltControl():
 
     def setVoltage(self,desiredV):
         if(desiredV < self.minV):
-            print "Desired V is less than min V";
+            print("Desired V is less than min V");
         elif(desiredV > self.maxV):
-            print "Desired V is more than max V";
+            print("Desired V is more than max V");
         else:
             self.set_value(int((10.8 - desiredV) / 0.084));
 

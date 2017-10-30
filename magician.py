@@ -17,22 +17,24 @@ from pydobot import Dobot
 global_status = "Running";
 process_running = False;
 
+R_OFFSET = 20;
+
 
 #x,y,z,r,duration
 
 Beakers = [ [0, 0, 0, 0, 0],      #0 dummy beaker for numbering
-            [-16.3, -214.8, 0, -197.2+10, 30], #1 # -135deg
-            [39.67, -290.2, 0, -185.15+20, 3],  #2 #  -112.6deg
-            [119.48, -173.56, 0, -158.4+20, 3], #3 # -90deg
-            [185.99, -193, 0, -122+20, 3], #4 # -67.6deg
-            [187.12, -66.2, 0, -96.4+15, 3], #5 # -45deg
-            [272.41, -13.6, 0, -79.9+20, 3],  #6 # -22.6deg
-            [211, -74.7, 0, 30.3+15, 3],    #7 # 0deg
-            [271.42, 34.54, 0, 32.1+20, 30],  #8 # 22.4deg
-            [198.72, 70.09, 0, 65+20, 3],   #9 # 45deg
-            [193.53, 206.47, 0, 92.4+18, 3],    #10 # 67.4deg
-            [-75.58, 242.89, 0, 152.8+20, 30], #11 # 130deg
-            [75.54, 183.83, 0, 113.22+25, 3]]; #12 #97deg
+            [-16.3, -214.8, 0, -197.2+R_OFFSET - 10, 30], #1 # -135deg
+            [39.67, -290.2, 0, -185.15+R_OFFSET -10, 3],  #2 #  -112.6deg
+            [119.48, -173.56, 0, -158.4+R_OFFSET- 10, 3], #3 # -90deg
+            [185.99, -193, 0, -122+R_OFFSET-10, 3], #4 # -67.6deg
+            [187.12, -66.2, 0, -96.4+R_OFFSET-10, 3], #5 # -45deg
+            [272.41, -13.6, 0, -79.9+R_OFFSET, 3],  #6 # -22.6deg
+            [211, -74.7, 0, 30.3+R_OFFSET-5, 3],    #7 # 0deg
+            [271.42, 34.54, 0, 32.1+R_OFFSET, 30],  #8 # 22.4deg
+            [198.72, 70.09, 0, 65+R_OFFSET, 3],   #9 # 45deg
+            [193.53, 206.47, 0, 92.4+R_OFFSET-2, 3],    #10 # 67.4deg
+            [-75.58, 242.89, 0, 152.8+R_OFFSET, 30], #11 # 130deg
+            [75.54, 183.83, 0, 113.22+R_OFFSET+5, 3]]; #12 #97deg
 
 
 class DobotPlating():
@@ -62,7 +64,7 @@ class DobotPlating():
         self.device.speed(60)
 
         self.z_up = 100
-        self.z_down = -30
+        self.z_down = -90
         #self.RH_Voltage = 2.5;
         #self.PD_Voltage = 1.9;
         #self.EC_Voltage = 4.8;
@@ -86,6 +88,13 @@ class DobotPlating():
     def move_xy(self, x, y, z, r, duration = 1):
         self.lastCmd = [x, y, z, r];
         self.device.go(x, y, z, r);  #MOVJ
+#        time.sleep(duration);
+#            print("in is move finished..");
+        print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));
+    
+    def move_xy_linear(self, x, y, z, r, duration = 1):
+        self.lastCmd = [x, y, z, r];
+        self.device.goMovL(x, y, z, r);  #MOVJ
 #        time.sleep(duration);
 #            print("in is move finished..");
         print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));
@@ -134,6 +143,8 @@ class DobotPlating():
         #move up
         
         #shake to drop the excess drops
+        self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3]);
+
         self.shake(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3], 2, None);
         
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3]);

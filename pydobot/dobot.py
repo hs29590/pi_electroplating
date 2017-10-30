@@ -157,6 +157,9 @@ class Dobot(threading.Thread):
 
     def go(self, x, y, z, r=0.):
         self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ)
+    
+    def goMovL(self, x, y, z, r=0.):
+        self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVL_XYZ)
 
     def suck(self, suck):
         self._set_end_effector_suction_cup(suck)

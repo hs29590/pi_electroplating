@@ -87,14 +87,15 @@ class Dobot(threading.Thread):
         msg = Message()
         msg.id = 10
         response = self._send_command(msg)
-        self.x = struct.unpack_from('f', response.params, 0)[0]
-        self.y = struct.unpack_from('f', response.params, 4)[0]
-        self.z = struct.unpack_from('f', response.params, 8)[0]
-        self.r = struct.unpack_from('f', response.params, 12)[0]
-        self.j1 = struct.unpack_from('f', response.params, 16)[0]
-        self.j2 = struct.unpack_from('f', response.params, 20)[0]
-        self.j3 = struct.unpack_from('f', response.params, 24)[0]
-        self.j4 = struct.unpack_from('f', response.params, 28)[0]
+        if response is not None:
+            self.x = struct.unpack_from('f', response.params, 0)[0]
+            self.y = struct.unpack_from('f', response.params, 4)[0]
+            self.z = struct.unpack_from('f', response.params, 8)[0]
+            self.r = struct.unpack_from('f', response.params, 12)[0]
+            self.j1 = struct.unpack_from('f', response.params, 16)[0]
+            self.j2 = struct.unpack_from('f', response.params, 20)[0]
+            self.j3 = struct.unpack_from('f', response.params, 24)[0]
+            self.j4 = struct.unpack_from('f', response.params, 28)[0]
         if self.verbose:
             print("pydobot: x:%03.1f y:%03.1f z:%03.1f r:%03.1f j1:%03.1f j2:%03.1f j3:%03.1f j4:%03.1f" %
                   (self.x, self.y, self.z, self.r, self.j1, self.j2, self.j3, self.j4))
@@ -128,7 +129,7 @@ class Dobot(threading.Thread):
         msg.ctrl = 0x03
         msg.params = bytearray([])
         msg.params.extend(bytearray(struct.pack('I', 0)))
-        return self._senf_command(msg);
+        return self._send_command(msg);
 
     def _set_ptp_common_params(self, velocity, acceleration):
         msg = Message()

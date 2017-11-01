@@ -122,6 +122,14 @@ class Dobot(threading.Thread):
         msg.params.extend(bytearray(struct.pack('f', acceleration)))
         return self._send_command(msg)
 
+    def _setHomeCmd(self):
+        msg = Message()
+        msg.id = 31
+        msg.ctrl = 0x03
+        msg.params = bytearray([])
+        msg.params.extend(bytearray(struct.pack('I', 0)))
+        return self._senf_command(msg);
+
     def _set_ptp_common_params(self, velocity, acceleration):
         msg = Message()
         msg.id = 83
@@ -158,6 +166,9 @@ class Dobot(threading.Thread):
     def go(self, x, y, z, r=0.):
         self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ)
     
+    def goHome(self):
+        self._setHomeCmd();
+
     def goMovL(self, x, y, z, r=0.):
         self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVL_XYZ)
 

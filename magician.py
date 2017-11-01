@@ -27,14 +27,14 @@ Beakers = [ [0, 0, 0, 0, 0],      #0 dummy beaker for numbering
             [39.67, -290.2, 0, -185.15+R_OFFSET -10, 3],  #2 #  -112.6deg
             [119.48, -173.56, 0, -158.4+R_OFFSET- 10, 3], #3 # -90deg
             [185.99, -193, 0, -122+R_OFFSET-10, 3], #4 # -67.6deg
-            [187.12, -66.2, 0, -96.4+R_OFFSET-5, 3], #5 # -45deg
+            [187.12, -66.2, 0, -96.4+R_OFFSET-10, 3], #5 # -45deg
             [272.41, -13.6, 0, -79.9+R_OFFSET-10, 3],  #6 # -22.6deg
             [211, -74.7, 0, 30.3+R_OFFSET-5, 3],    #7 # 0deg
             [271.42, 34.54, 0, 32.1+R_OFFSET, 30],  #8 # 22.4deg
             [198.72, 70.09, 0, 65+R_OFFSET, 3],   #9 # 45deg
             [193.53, 206.47, 0, 92.4+R_OFFSET-2, 3],    #10 # 67.4deg
             [-75.58, 242.89, 0, 152.8+R_OFFSET-5, 30], #11 # 130deg
-            [75.54, 183.83, 0, 113.22+R_OFFSET, 3]]; #12 #97deg
+            [75.54, 183.83, 0, 113.22+R_OFFSET+5, 3]]; #12 #97deg
 
 
 class DobotPlating():
@@ -72,6 +72,9 @@ class DobotPlating():
         self.home_xyzr = [215, 0, self.z_up, 0];                    
         global global_status
         global_status = "Rh Electroplating";
+    
+    def calibrate(self):
+        self.device.goHome();
 
     def isMoveFinished(self):
         euDist = math.pow(self.lastCmd[0] - self.device.x,2) + math.pow(self.lastCmd[1] - self.device.y, 2) + math.pow(self.lastCmd[2] - self.device.z, 2) + math.pow(self.lastCmd[3] - self.device.r, 2);
@@ -91,7 +94,7 @@ class DobotPlating():
 #        time.sleep(duration);
 #            print("in is move finished..");
         print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));
-    
+   
     def move_xy_linear(self, x, y, z, r, duration = 1):
         self.lastCmd = [x, y, z, r];
         self.device.goMovL(x, y, z, r);  #MOVJ
@@ -114,6 +117,7 @@ class DobotPlating():
 
         print ("Doing beaker %d now" % (id));
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3], 0.3);
+        self.move_xy(Beakers[id][0], Beakers[id][1], (self.z_up + self.z_down)/2.0 , Beakers[id][3], 0.3); #adding a mid point so that the Joint motion isn't touching th edges of the beakers
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], 0.3);
         dispStr = "Step " + str(id) + ": ";
         while(not self.isMoveFinished()):
@@ -143,7 +147,9 @@ class DobotPlating():
         #move up
         
         #shake to drop the excess drops
-        self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3]);
+        #go half way to adjust for MOVJ
+        self.move_xy(Beakers[id][0], Beakers[id][1], (self.z_up + self.z_down)/2.0 , Beakers[id][3], 0.3); #adding a mid point so that the Joint motion isn't touching th edges of the beakers
+        #self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3]);
 
         self.shake(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3], 2, None);
         
@@ -352,7 +358,7 @@ class PlatingGUI():
         posy = (screenh/2) - (frameh/2);
         self.toplevel.geometry( "%dx%d+%d+%d" % (framew,frameh,posx,posy))
         #self.toplevel.geometry("300x75+500+500");
-        self.label1 = Label(self.toplevel, text="BRING ROBOT TO HOME POSITION", height=0, width=100)
+        self.label1 = Label(self.toplevel, text="ROBOT WILL CALIBRATE. CLEAR AREA!", height=0, width=100)
         self.label1.pack(padx=5)
         self.but1 = Button(self.toplevel, text="OK", command=self.okpressed);
         self.but1.pack(pady=5);
@@ -361,6 +367,11 @@ class PlatingGUI():
         self.toplevel.destroy();
 
     def okpressed(self):
+        global global_status
+        global_status = "Calibrating.. Please wait!";
+        self.dobotPlating.calibrate();
+        time.sleep(20);
+        global_status = "Calibration Done";
         self.readyToStart = True;
         self.dobotPlating.move_home();
         self.toplevel.destroy();

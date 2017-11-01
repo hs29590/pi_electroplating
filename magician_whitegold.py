@@ -30,7 +30,7 @@ Beakers = [ [0, 0, 0, 0, 0],      #0 dummy beaker for numbering
             [187.12, -66.2, 0, -96.4+R_OFFSET-10, 5], #5 # -45deg
             [272.41, -13.6, 0, -79.9+R_OFFSET-10, 5],  #6 # -22.6deg
             [211, -74.7, 0, 30.3+R_OFFSET-5, 5],    #7 # 0deg
-            [271.42, 34.54, 0, 32.1+R_OFFSET, 60],  #8 # 22.4deg
+            [271.42, 34.54, 0, 32.1+R_OFFSET, 30],  #8 # 22.4deg
             [198.72, 70.09, 0, 65+R_OFFSET, 5],   #9 # 45deg
             [193.53, 206.47, 0, 92.4+R_OFFSET-2, 5],    #10 # 67.4deg
             [-75.58, 242.89, 0, 152.8+R_OFFSET-5, 60], #11 # 130deg
@@ -195,17 +195,17 @@ class DobotPlating():
         self.up_down_beaker(7);
 
         #8
-        global_status = "Step 8: Pd Solution"
-        self.dvc.setVoltage(PD_Voltage);
-        self.up_down_beaker(8);
+        #global_status = "Step 8: Pd Solution"
+        #self.dvc.setVoltage(PD_Voltage);
+        #self.up_down_beaker(8);
         
         #9
-        global_status = "Step 9: Pd Dragout"
-        self.up_down_beaker(9);
+        #global_status = "Step 9: Pd Dragout"
+        #self.up_down_beaker(9);
         
         #10
-        global_status = "Step 10: Water"
-        self.up_down_beaker(10);
+        #global_status = "Step 10: Water"
+        #self.up_down_beaker(10);
         
         #11
         global_status = "Step 11: Rh Solution"

@@ -247,7 +247,7 @@ class PlatingGUI():
         
         self.calibrated = False;
 
-        framew = 550; # root w
+        framew = 500; # root w
         frameh = 300; # root h
         screenw = self.root.winfo_screenwidth();
         screenh = self.root.winfo_screenheight();
@@ -258,34 +258,29 @@ class PlatingGUI():
         self.current_status = StringVar();
         self.current_status.set('Rh Electroplating');
 
-        self.mainframe = ttk.Frame(self.root, padding="10 10 30 30", height=300, width=550)
+        self.mainframe = ttk.Frame(self.root, padding="10 10 30 30", height=300, width=500)
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-        self.mainframe.columnconfigure(0, weight=50)
-        self.mainframe.rowconfigure(0, weight=50)
-        self.mainframe.grid_propagate(0);
+        self.mainframe.columnconfigure(0, weight=50,minsize=50)
+        self.mainframe.rowconfigure(0, weight=50,minsize=50)
+        #self.mainframe.grid_propagate(0);
 
         self.buttonStyle = ttk.Style()
         self.buttonStyle.configure('my.TButton', font=('Helvetica', 18))
         
-        self.l = ttk.Label(self.root, textvariable=self.current_status, font=('Helvetica',18));
-        self.l.place(relx=0.35, rely=0.3, anchor='center')
+        self.l = ttk.Label(self.mainframe, textvariable=self.current_status, font=('Helvetica',18));
+        #self.l.place(relx=0.35, rely=0.3, anchor='center')
+        self.l.grid(row=0, column=0, columnspan=2, pady=5)
 
         self.ecvar = StringVar(self.root)
         self.pdvar = StringVar(self.root)
         self.rhvar = StringVar(self.root)
         self.processType = StringVar(self.root)
-#self.chosenProcess = StringVar(self.root);
         
-        #ecchoices = { '4.0','4.5','4.7', '5.6'}
         ecchoices = {'5.6'}
         pdchoices = { '1.8','1.9','2.0','2.1'}
         rhchoices = { '2.5','2.6','2.75','2.85','3.0'}
         processChoices = {PROCESS_RH_PD, PROCESS_RH_60, PROCESS_RH_20};
        
-#        self.processChoices = {'Pd-1min, Rh-1min', 'Only Rh-20sec', 'Only Rh-1 min'}
-
-#        self.chosenProcess.set('Pd-1min, Rh-1min');
-
         self.ecvar.set('5.6') # set the default option
         self.pdvar.set('1.9')
         self.rhvar.set('2.5')
@@ -296,51 +291,31 @@ class PlatingGUI():
         self.pdVoltage = float(self.pdvar.get());
         self.rhVoltage = float(self.rhvar.get());
         self.processToDo = self.processType.get();
-#        self.processType = self.chosenProcess.get(); #pd1min, rh1min
         
-        #ecpopupMenu = OptionMenu(self.mainframe, self.ecvar, *ecchoices)
-        #Label(self.mainframe, text="EC Voltage").grid(row = 7, column = 1, padx=5, pady=5, sticky=E)
-        #ecpopupMenu.grid(row = 9, column =1, padx=5, pady=5, sticky=E)
-        #ecpopupMenu.bind('<Button-1>', self.dropdownopen)
-
-#        chooseProcessMenu = OptionMenu(self.mainframe, self.chosenProcess, *self.processChoices);
-#        Label(self.mainframe, text="Choose Process").grid(row = 9, column = 2, padx=5, pady=5, sticky=S);
-#        chooseProcessMenu.grid(row=10, column = 2, padx=5, pady=5, sticky=S);
-#        chooseProcessMenu.bind('<Button-1>', self.dropdownopen);
         processChoicepopupMenu = OptionMenu(self.mainframe, self.processType, *processChoices)
-        Label(self.mainframe, text="Choose Process").grid(row = 4, column = 1, pady=3, sticky=E)
-#Label(self.mainframe, text="Pd Voltage").place(x = 200, y = 100)
-        processChoicepopupMenu.grid(row = 5, column =1, pady=3, sticky=E)
-        # pdpopupMenu.grid(row = 8, column =1, padx=5, pady=5, sticky=W)
+        Label(self.mainframe, text="Choose Process", font=("Helvetica", 14)).grid(row = 2, column=1, pady=(15,2))
+        processChoicepopupMenu.grid(row=3, column=1)
         processChoicepopupMenu.bind('<Button-1>', self.dropdownopen)
         
         pdpopupMenu = OptionMenu(self.mainframe, self.pdvar, *pdchoices)
-        Label(self.mainframe, text="Pd Voltage").grid(row = 7, column = 1, pady=3, sticky=E)
-#Label(self.mainframe, text="Pd Voltage").place(x = 200, y = 100)
-        pdpopupMenu.grid(row = 8, column =1, pady=3, sticky=E)
-        # pdpopupMenu.grid(row = 8, column =1, padx=5, pady=5, sticky=W)
+        Label(self.mainframe, text="Pd Voltage", font=("Helvetica", 14)).grid(row = 5, column = 0, pady=(15,2))
+        pdpopupMenu.grid(row = 6, column =0)
         pdpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         rhpopupMenu = OptionMenu(self.mainframe, self.rhvar, *rhchoices)
-        Label(self.mainframe, text="Rh Voltage").grid(row = 7, column = 2, pady=3, sticky=W)
-        rhpopupMenu.grid(row = 8, column =2, pady=3, sticky=W)
-#       rhpopupMenu.grid(row = 8, column =2, padx=5, pady=5, sticky=W)
+        Label(self.mainframe, text="Rh Voltage", font=("Helvetica", 14)).grid(row = 5, column = 1, pady=(15,2))
+        rhpopupMenu.grid(row = 6, column=1)
         rhpopupMenu.bind('<Button-1>', self.dropdownopen)
         
-        # link function to change dropdown
-#        self.chosenProcess.trace('w', self.process_change);
         self.ecvar.trace('w', self.ec_change)
         self.pdvar.trace('w', self.pd_change)
         self.rhvar.trace('w', self.rh_change)
         self.processType.trace('w', self.process_change)
 
-
-        #ttk.Button(self.mainframe, text="Gripper Open", style='my.TButton', command=self.gripperOpen, width=16).grid(column=2, columnspan=2, row=2, sticky=W)
-        ttk.Button(self.mainframe, text="Calibrate", style='my.TButton', command=self.calibrateDobot, width=16).grid(column=2, columnspan=2, row=3, sticky=W)
-        ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(column=1, row=2, sticky=W )
-        ttk.Button(self.mainframe, text="Stop", style='my.TButton', command=self.stopProcess, width=16).grid(column=1, row=3, sticky=W)
+        ttk.Button(self.mainframe, text="Calibrate", style='my.TButton', command=self.calibrateDobot, width=16).grid(row=2, rowspan=2, column=0, pady=5)
+        ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(row=8, rowspan=2,column=0, pady=(20,2))
+        ttk.Button(self.mainframe, text="Exit", style='my.TButton', command=self.stopProcess, width=16).grid(row=8, rowspan=2, column=1, pady=(20,2))
   
-        #self.root.after(1, self.initialPopup);
         self.root.after(1000, self.updateLabel);
     
    #     self.dobotPlating = DobotPlating();
@@ -385,28 +360,13 @@ class PlatingGUI():
         posy = (screenh/2) - (frameh/2);
         self.toplevel.geometry( "%dx%d+%d+%d" % (framew,frameh,posx,posy))
         #self.toplevel.geometry("300x75+500+500");
-        self.label1 = Label(self.toplevel, text="ROBOT WILL CALIBRATE. CLEAR AREA!", height=0, width=100)
+        self.label1 = Label(self.toplevel, text="Please Calibrate First!", font=("Helvetica",14), height=0, width=100)
         self.label1.pack(padx=5)
-        self.but1 = Button(self.toplevel, text="OK", command=self.okpressed);
+        self.but1 = Button(self.toplevel, text="OK", command=self.dropdownokpressed);
         self.but1.pack(pady=5);
         
     def dropdownokpressed(self):
         self.toplevel.destroy();
-
-#    def okpressed(self):
-        #global global_status
-        #global_status = "Calibrating.. Please wait!";
-        #self.dobotPlating.calibrate();
-        #time.sleep(20);
-        #global_status = "Calibration Done";
-#        self.readyToStart = True;
-        #self.dobotPlating.move_home();
-#        self.toplevel.destroy();
-
-#    def process_change(self,*args):
-#        self.processType = self.chosenProcess.get();
-#        print( ' Process changed to: '),
-#        print (self.processType);
 
     def ec_change(self,*args):
         self.ecVoltage = float(self.ecvar.get());
@@ -436,20 +396,22 @@ class PlatingGUI():
         global global_status;
         self.current_status.set(global_status);
         self.l.config(textvariable=self.current_status);
-        self.l.place(x=100, y=5)
-        #self.l.grid(row=1, column=1, columnspan=3, sticky=N)
+        #self.l.place(x=100, y=5)
+        self.l.grid(row=0)
         self.l.update_idletasks();
         self.root.update_idletasks();
         self.root.after(500, self.updateLabel);
 
     def stopProcess(self):
-        #del self.dobotPlating
+        del self.dobotPlating
         self.root.quit();
 
     def popup(self):
         global process_running
         if(not process_running and self.calibrated):
            self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage,));
+        else:
+            self.initialPopup();
     
     def __del__(self):
         if self.processThread is not None:

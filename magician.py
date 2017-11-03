@@ -57,6 +57,8 @@ class DobotPlating():
         self.gripper = ServoGripper(2);
         self.dvc = DigitalVoltControl();
 
+        self.RH_Duration = 60;
+
         self.lastCmd = [0,0,0,0]; #x, y, z, r
 
         print("Setting Port to " + self.DobotPort);
@@ -139,9 +141,9 @@ class DobotPlating():
             
         if(id == 1 or id == 8 or id == 11):
             if(id == 11):
-                self.shake(Beakers[id][0], Beakers[id][1], self.z_down - 20, Beakers[id][3], Beakers[id][4], dispStr); #x, y, z and shake_duration
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down - 20, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
             else:
-                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], dispStr); #x, y, z and shake_duration
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
         else:    
             self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], None); #x, y, z and shake_duration
         
@@ -162,10 +164,15 @@ class DobotPlating():
         while(not self.isMoveFinished()):
             time.sleep(0.01);
      
-    def startProcess(self, EC_Voltage, PD_Voltage, RH_Voltage):
+    def startProcess(self, EC_Voltage, PD_Voltage, RH_Voltage, processType):
         global process_running
         process_running = True;
         global global_status
+
+        self.RH_Duration = 60;
+        if(processType == PROCESS_RH_20):
+            self.RH_Duration = 20;
+
         global_status = "Step 1: EC"
         #1
         if(EC_Voltage == 5.6):
@@ -199,29 +206,39 @@ class DobotPlating():
         self.up_down_beaker(7);
 
         #8
-        global_status = "Step 8: Pd Solution"
-        self.dvc.setVoltage(PD_Voltage);
-        self.up_down_beaker(8);
+        if(processType == PROCESS_RH_PD):
+            global_status = "Step 8: Pd Solution"
+            self.dvc.setVoltage(PD_Voltage);
+            self.up_down_beaker(8);
         
-        #9
-        global_status = "Step 9: Pd Dragout"
-        self.up_down_beaker(9);
+            #9
+            global_status = "Step 9: Pd Dragout"
+            self.up_down_beaker(9);
         
-        #10
-        global_status = "Step 10: Water"
-        self.up_down_beaker(10);
+            #10
+            global_status = "Step 10: Water"
+            self.up_down_beaker(10);
         
         #11
-        global_status = "Step 11: Rh Solution"
+        if(processType == PROCESS_RH_PD):
+            global_status = "Step 11: Rh Solution"
+        else
+            global_status = "Step 8: Rh Solution"
         self.dvc.setVoltage(RH_Voltage);
         self.up_down_beaker(11);
         
         #12
-        global_status = "Step 12: Rh Dragout"
+        if(processType == PROCESS_RH_PD):
+            global_status = "Step 12: Rh Dragout"
+        else
+            global_status = "Step 9: Rh Dragout"
         self.up_down_beaker(12);
         
         #13 #repeat of beaker 10
-        global_status = "Step 13: Water"
+        if(processType == PROCESS_RH_PD):
+            global_status = "Step 13: Water"
+        else
+            global_status = "Step 10: Water"
         self.up_down_beaker(10);
 
         #Home
@@ -405,11 +422,12 @@ class PlatingGUI():
     def stopProcess(self):
         del self.dobotPlating
         self.root.quit();
+        exit(1);
 
     def popup(self):
         global process_running
         if(not process_running and self.calibrated):
-           self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage,));
+           self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage, self.processToDo));
         else:
             self.initialPopup();
     

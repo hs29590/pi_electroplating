@@ -133,29 +133,29 @@ class DobotPlating():
             self.move_xy(x, y, z - 10, r, 0.1);
             tdiff = t_end - time.time();
         
-    def up_down_beaker(self,id):
+    def up_down_beaker(self,id,dispStr=None):
 
         print ("Doing beaker %d now" % (id));
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3], 0.3);
         self.move_xy(Beakers[id][0], Beakers[id][1], (self.z_up + self.z_down)/2.0 , Beakers[id][3], 0.3); #adding a mid point so that the Joint motion isn't touching th edges of the beakers
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], 0.3);
-        dispStr = "Step " + str(id) + ": ";
+        #dispStr = "Step " + str(id) + ": ";
         while(not self.isMoveFinished()):
             time.sleep(0.01);
 
         if(id == 1):
             self.ecRelay.on();
-            dispStr = dispStr + "EC "
+        #    dispStr = dispStr + "EC "
         elif(id == 8):
             self.pdRelay.on();
-            dispStr = dispStr + "Pd Solution "
+        #    dispStr = dispStr + "Pd Solution "
         elif(id == 11):
             self.rhRelay.on();
-            dispStr = dispStr + "Rh Solution "
+        #    dispStr = dispStr + "Rh Solution "
             
         if(id == 1 or id == 8 or id == 11):
             if(id == 11):
-                self.shake(Beakers[id][0], Beakers[id][1], self.z_down - 20, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down - 10, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
             else:
                 self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
         else:    
@@ -193,7 +193,7 @@ class DobotPlating():
             self.dvc.setMaxVoltage();
         else:
             self.dvc.setVoltage(EC_Voltage);
-        self.up_down_beaker(1);
+        self.up_down_beaker(1, global_status);
         
         #2
         global_status = "Step 2: Dragout"
@@ -223,7 +223,7 @@ class DobotPlating():
         if(processType == PROCESS_RH_PD):
             global_status = "Step 8: Pd Solution"
             self.dvc.setVoltage(PD_Voltage);
-            self.up_down_beaker(8);
+            self.up_down_beaker(8, global_status);
         
             #9
             global_status = "Step 9: Pd Dragout"
@@ -239,7 +239,7 @@ class DobotPlating():
         else:
             global_status = "Step 8: Rh Solution"
         self.dvc.setVoltage(RH_Voltage);
-        self.up_down_beaker(11);
+        self.up_down_beaker(11, global_status);
         
         #12
         if(processType == PROCESS_RH_PD):

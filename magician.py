@@ -222,7 +222,7 @@ class DobotPlating():
         #11
         if(processType == PROCESS_RH_PD):
             global_status = "Step 11: Rh Solution"
-        else
+        else:
             global_status = "Step 8: Rh Solution"
         self.dvc.setVoltage(RH_Voltage);
         self.up_down_beaker(11);
@@ -230,14 +230,14 @@ class DobotPlating():
         #12
         if(processType == PROCESS_RH_PD):
             global_status = "Step 12: Rh Dragout"
-        else
+        else:
             global_status = "Step 9: Rh Dragout"
         self.up_down_beaker(12);
         
         #13 #repeat of beaker 10
         if(processType == PROCESS_RH_PD):
             global_status = "Step 13: Water"
-        else
+        else:
             global_status = "Step 10: Water"
         self.up_down_beaker(10);
 

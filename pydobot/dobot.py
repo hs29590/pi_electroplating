@@ -131,6 +131,17 @@ class Dobot(threading.Thread):
         msg.params.extend(bytearray(struct.pack('I', 0)))
         return self._send_command(msg);
 
+    def _setHomeParams(self, x, y, z, r):
+        msg = Message();
+        msg.id = 30;
+        msg.ctrl = 0x03;
+        msg.params = bytearray([]);
+        msg.params.extend(bytearray(struct.pack('f', x)))
+        msg.params.extend(bytearray(struct.pack('f', y)))
+        msg.params.extend(bytearray(struct.pack('f', z)))
+        msg.params.extend(bytearray(struct.pack('f', r)))
+        return self._send_command(msg)
+
     def _set_ptp_common_params(self, velocity, acceleration):
         msg = Message()
         msg.id = 83
@@ -165,13 +176,16 @@ class Dobot(threading.Thread):
         return self._send_command(msg)
 
     def go(self, x, y, z, r=0.):
-        self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ)
-    
+        return self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ)
+   
+    def setHomeParams(self, x, y, z, r):
+        return self._setHomeParams(x,y,z,r);
+
     def goHome(self):
-        self._setHomeCmd();
+        return self._setHomeCmd();
 
     def goMovL(self, x, y, z, r=0.):
-        self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVL_XYZ)
+        return self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVL_XYZ)
 
     def suck(self, suck):
         self._set_end_effector_suction_cup(suck)

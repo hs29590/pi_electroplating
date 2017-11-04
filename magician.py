@@ -80,6 +80,7 @@ class DobotPlating():
         global_status = "Rh Electroplating";
     
     def calibrate(self):
+        self.device.setHomeParams(self.home_xyzr[0], self.home_xyzr[1], self.home_xyzr[2], self.home_xyzr[3]);
         self.device.goHome();
 
     def isMoveFinished(self):

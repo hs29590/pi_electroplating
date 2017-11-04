@@ -80,8 +80,14 @@ class DobotPlating():
         global_status = "Rh Electroplating";
     
     def calibrate(self):
-        self.device.setHomeParams(self.home_xyzr[0], self.home_xyzr[1], self.home_xyzr[2], self.home_xyzr[3]);
-        self.device.goHome();
+        global global_status
+        response = self.device.setHomeParams(self.home_xyzr[0], self.home_xyzr[1], self.home_xyzr[2], self.home_xyzr[3]);
+        if(response):
+            global_status = "Error..";
+
+        response = self.device.goHome();
+        if(response):
+            global_status = "Error..";
 
     def isMoveFinished(self):
         euDist = math.pow(self.lastCmd[0] - self.device.x,2) + math.pow(self.lastCmd[1] - self.device.y, 2) + math.pow(self.lastCmd[2] - self.device.z, 2) + math.pow(self.lastCmd[3] - self.device.r, 2);
@@ -97,14 +103,21 @@ class DobotPlating():
 
     def move_xy(self, x, y, z, r, duration = 1):
         self.lastCmd = [x, y, z, r];
-        self.device.go(x, y, z, r);  #MOVJ
+        response = self.device.go(x, y, z, r);  #MOVJ
+        if(response):
+            global global_status
+            global_status = "Error..";
+
 #        time.sleep(duration);
 #            print("in is move finished..");
         print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));
    
     def move_xy_linear(self, x, y, z, r, duration = 1):
         self.lastCmd = [x, y, z, r];
-        self.device.goMovL(x, y, z, r);  #MOVJ
+        response = self.device.goMovL(x, y, z, r);  #MOVJ
+        if(response):
+            global global_status
+            global_status = "Error..";
 #        time.sleep(duration);
 #            print("in is move finished..");
         print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));

@@ -95,7 +95,6 @@ class DobotPlating():
         if(euDist < 2):
             return True;
         else:
-            #print("still moving ..");
             return False;
         
     def move_home(self):
@@ -110,7 +109,7 @@ class DobotPlating():
 
 #        time.sleep(duration);
 #            print("in is move finished..");
-        print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));
+#        print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));
    
     def move_xy_linear(self, x, y, z, r, duration = 1):
         self.lastCmd = [x, y, z, r];
@@ -128,7 +127,7 @@ class DobotPlating():
         tdiff = t_end - time.time();
         while tdiff > 0:
             if(dispStr is not None):
-                global_status = dispStr + str(int(tdiff)) + "s"
+                global_status = dispStr + " " + str(int(tdiff)) + "s"
             self.move_xy(x, y, z + 10, r, 0.1);
             self.move_xy(x, y, z - 10, r, 0.1);
             tdiff = t_end - time.time();

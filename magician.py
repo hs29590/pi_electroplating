@@ -47,6 +47,8 @@ class DobotPlating():
         if len(available_ports) == 0:
             print('no port /dev/tty*USB* found for Dobot Magician')
             exit(1)
+        else:
+            dobotPort = available_ports[0];
 
         #self.DobotPort = 'COM4'
         self.DobotPort = dobotPort;
@@ -60,14 +62,14 @@ class DobotPlating():
         self.RH_Duration = 60;
 
         self.lastCmd = [0,0,0,0]; #x, y, z, r
-
+    
         print("Setting Port to " + self.DobotPort);
         self.device = Dobot(port=self.DobotPort)
         time.sleep(1)
         if self.device is not None:
             print("Opened connection")
 
-        self.device.speed(60)
+        self.device.speed()
 
         self.z_up = 100
         self.z_down = -70
@@ -82,12 +84,12 @@ class DobotPlating():
     def calibrate(self):
         global global_status
         response = self.device.setHomeParams(self.home_xyzr[0], self.home_xyzr[1], self.home_xyzr[2], self.home_xyzr[3]);
-        if(response):
-            global_status = "Error..";
+#if(response):
+#           global_status = "Error..";
 
         response = self.device.goHome();
-        if(response):
-            global_status = "Error..";
+#        if(response):
+#            global_status = "Error..";
 
     def isMoveFinished(self):
         euDist = math.pow(self.lastCmd[0] - self.device.x,2) + math.pow(self.lastCmd[1] - self.device.y, 2) + math.pow(self.lastCmd[2] - self.device.z, 2) + math.pow(self.lastCmd[3] - self.device.r, 2);
@@ -104,9 +106,9 @@ class DobotPlating():
     def move_xy(self, x, y, z, r, duration = 1):
         self.lastCmd = [x, y, z, r];
         response = self.device.go(x, y, z, r);  #MOVJ
-        if(response):
-            global global_status
-            global_status = "Error..";
+#        if(response):
+#            global global_status
+#            global_status = "Error..";
 
 #        time.sleep(duration);
 #            print("in is move finished..");
@@ -115,22 +117,23 @@ class DobotPlating():
     def move_xy_linear(self, x, y, z, r, duration = 1):
         self.lastCmd = [x, y, z, r];
         response = self.device.goMovL(x, y, z, r);  #MOVJ
-        if(response):
-            global global_status
-            global_status = "Error..";
+#        if(response):
+#            global global_status
+#            global_status = "Error..";
 #        time.sleep(duration);
 #            print("in is move finished..");
         print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));
         
-    def shake(self, x, y, z, r, shakeDuration, dispStr):
+    def shake(self, x, y, z, r, shakeDuration, dispStr, dontShake=False, doInOut=False):
         global global_status;
         t_end = time.time() + shakeDuration;
         tdiff = t_end - time.time();
         while tdiff > 0:
             if(dispStr is not None):
-                global_status = dispStr + str(int(tdiff)) + "s"
-            self.move_xy(x, y, z + 10, r, 0.1);
-            self.move_xy(x, y, z - 10, r, 0.1);
+                global_status = dispStr + " " + str(int(tdiff)) + "s"
+            if(not dontShake):
+                self.move_xy(x, y, z + 10, r, 0.1);
+                self.move_xy(x, y, z - 10, r, 0.1);
             tdiff = t_end - time.time();
         
     def up_down_beaker(self,id,dispStr=None):
@@ -156,6 +159,8 @@ class DobotPlating():
         if(id == 1 or id == 8 or id == 11):
             if(id == 11):
                 self.shake(Beakers[id][0], Beakers[id][1], self.z_down - 10, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
+            elif(id == 1): #dont' shake
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], self.RH_Duration, dispStr, True); #x, y, z and shake_duration
             else:
                 self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
         else:    
@@ -357,8 +362,8 @@ class PlatingGUI():
             print('Will Calibrate now..');
             global global_status;  
             global_status = "Calibrating.. Please Wait!";
-            #self.dobotPlating.calibrate();
-            #time.sleep(20);
+            self.dobotPlating.calibrate();
+            time.sleep(20);
             self.calibrated = True;
             global_status = "Calibrated";
 

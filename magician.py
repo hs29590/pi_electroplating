@@ -160,9 +160,9 @@ class DobotPlating():
             if(id == 11):
                 self.shake(Beakers[id][0], Beakers[id][1], self.z_down - 10, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
             elif(id == 1): #dont' shake
-                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], self.RH_Duration, dispStr, True); #x, y, z and shake_duration
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], dispStr, True); #x, y, z and shake_duration
             else:
-                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], dispStr); #x, y, z and shake_duration
         else:    
             self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], None); #x, y, z and shake_duration
         

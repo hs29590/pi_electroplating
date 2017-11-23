@@ -375,8 +375,8 @@ class PlatingGUI():
         ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(row=8, rowspan=2,column=0, pady=(20,2))
         ttk.Button(self.mainframe, text="Exit", style='my.TButton', command=self.stopProcess, width=16).grid(row=8, rowspan=2, column=1, pady=(20,2))
         
-        self.processStepIndicator = ttk.Label(self.mainframe, textvariable=self.stepIndicator, font=('Helvetica',10));
-        self.processStepIndicator.grid(row=9, column=1,pady=5)
+        self.processStepIndicator = ttk.Label(self.mainframe, textvariable=self.stepIndicator, font=('Helvetica',7));
+        self.processStepIndicator.grid(row=11,column=1,pady=5)
   
         self.root.after(1000, self.updateLabel);
     

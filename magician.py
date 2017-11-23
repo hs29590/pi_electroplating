@@ -15,6 +15,7 @@ from ServoGripper import ServoGripper
 from pydobot import Dobot
 
 global_status = "Running";
+global_step_indicator = "None";
 process_running = False;
 
 R_OFFSET = 20;
@@ -92,18 +93,25 @@ class DobotPlating():
 #            global_status = "Error..";
 
     def isMoveFinished(self):
+        global global_step_indicator;
+        global_step_indicator = "isMoveFinished";
+        
         euDist = math.pow(self.lastCmd[0] - self.device.x,2) + math.pow(self.lastCmd[1] - self.device.y, 2) + math.pow(self.lastCmd[2] - self.device.z, 2) + math.pow(self.lastCmd[3] - self.device.r, 2);
         euDist = math.sqrt(euDist);
-        if(euDist < 2):
+        if(euDist < 10):
             return True;
         else:
             #print("still moving ..");
             return False;
         
     def move_home(self):
+        global global_step_indicator;
+        global_step_indicator = "move_home";
         self.move_xy(self.home_xyzr[0], self.home_xyzr[1], self.home_xyzr[2], self.home_xyzr[3], 0.3);
 
     def move_xy(self, x, y, z, r, duration = 1):
+        global global_step_indicator;
+        global_step_indicator = "move_xy";
         self.lastCmd = [x, y, z, r];
         response = self.device.go(x, y, z, r);  #MOVJ
 #        if(response):
@@ -125,6 +133,8 @@ class DobotPlating():
         print("xyzr position: " + str(self.device.x) + ", " + str(self.device.y) + ", " + str(self.device.z) + ", " + str(self.device.r));
         
     def shake(self, x, y, z, r, shakeDuration, dispStr, dontShake=False, doInOut=False):
+        global global_step_indicator;
+        global_step_indicator = "shake ";
         global global_status;
         t_end = time.time() + shakeDuration;
         tdiff = t_end - time.time();
@@ -145,6 +155,9 @@ class DobotPlating():
         #dispStr = "Step " + str(id) + ": ";
         while(not self.isMoveFinished()):
             time.sleep(0.01);
+        
+        global global_step_indicator;
+        global_step_indicator = "up_down_beaker " + str(id);
 
         if(id == 1):
             self.ecRelay.on();
@@ -166,6 +179,9 @@ class DobotPlating():
         else:    
             self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], None); #x, y, z and shake_duration
         
+        global global_step_indicator;
+        global_step_indicator = "bottom_shake_finished";
+        
         self.ecRelay.off();
         self.pdRelay.off();
         self.rhRelay.off();
@@ -180,8 +196,12 @@ class DobotPlating():
         
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_up, Beakers[id][3]);
         
+        global_step_indicator = "excess_shake_finished";
+        
         while(not self.isMoveFinished()):
             time.sleep(0.01);
+        
+        global_step_indicator = "excess_shake_move_finished";
      
     def startProcess(self, EC_Voltage, PD_Voltage, RH_Voltage, processType):
         global process_running
@@ -294,6 +314,9 @@ class PlatingGUI():
         self.current_status = StringVar();
         self.current_status.set('Rh Electroplating');
 
+        self.stepIndicator = StringVar();
+        self.stepIndicator.set('_init_');
+
         self.mainframe = ttk.Frame(self.root, padding="10 10 30 30", height=300, width=500)
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         self.mainframe.columnconfigure(0, weight=50,minsize=50)
@@ -351,6 +374,9 @@ class PlatingGUI():
         ttk.Button(self.mainframe, text="Calibrate", style='my.TButton', command=self.calibrateDobot, width=16).grid(row=2, rowspan=2, column=0, pady=5)
         ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(row=8, rowspan=2,column=0, pady=(20,2))
         ttk.Button(self.mainframe, text="Exit", style='my.TButton', command=self.stopProcess, width=16).grid(row=8, rowspan=2, column=1, pady=(20,2))
+        
+        self.processStepIndicator = ttk.Label(self.mainframe, textvariable=self.stepIndicator, font=('Helvetica',10));
+        self.processStepIndicator.grid(row=9, column=1,pady=5)
   
         self.root.after(1000, self.updateLabel);
     
@@ -432,9 +458,14 @@ class PlatingGUI():
         global global_status;
         self.current_status.set(global_status);
         self.l.config(textvariable=self.current_status);
-        #self.l.place(x=100, y=5)
         self.l.grid(row=0)
         self.l.update_idletasks();
+    
+        global global_step_indicator;
+        self.stepIndicator.set(global_step_indicator);
+        self.processStepIndicator.config(textvariable=self.stepIndicator);
+        self.processStepIndicator.update_idletasks();
+
         self.root.update_idletasks();
         self.root.after(500, self.updateLabel);
 

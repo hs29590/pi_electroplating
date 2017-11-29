@@ -61,6 +61,7 @@ class DobotPlating():
         self.dvc = DigitalVoltControl();
 
         self.RH_Duration = 60;
+        self.PD_DURATION = 60;
 
         self.lastCmd = [0,0,0,0]; #x, y, z, r
     
@@ -145,6 +146,20 @@ class DobotPlating():
                 self.move_xy(x, y, z + 10, r, 0.1);
                 self.move_xy(x, y, z - 10, r, 0.1);
             tdiff = t_end - time.time();
+    
+    def shakeHalfUp(self, x, y, z, r, shakeDuration, dispStr, dontShake=False, doInOut=False):
+        global global_step_indicator;
+        global_step_indicator = "shake ";
+        global global_status;
+        t_end = time.time() + shakeDuration;
+        tdiff = t_end - time.time();
+        while tdiff > 0:
+            if(dispStr is not None):
+                global_status = dispStr + " " + str(int(tdiff)) + "s"
+            if(not dontShake):
+                self.move_xy(x, y, (self.z_up + self.z_down)/2.0, r, 0.1);
+                self.move_xy(x, y, z - 10, r, 0.1);
+            tdiff = t_end - time.time();
         
     def up_down_beaker(self,id,dispStr=None):
 
@@ -174,10 +189,10 @@ class DobotPlating():
                 self.shake(Beakers[id][0], Beakers[id][1], self.z_down - 10, Beakers[id][3], self.RH_Duration, dispStr); #x, y, z and shake_duration
             elif(id == 1): #dont' shake
                 self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], dispStr, True); #x, y, z and shake_duration
-            else:
-                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], dispStr); #x, y, z and shake_duration
+            else: #this means id is 8 i.e. Pd
+                self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], self.PD_Duration, dispStr); #x, y, z and shake_duration
         else:    
-            self.shake(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], None); #x, y, z and shake_duration
+            self.shakeHalfUp(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], Beakers[id][4], None); #x, y, z and shake_duration
         
         global global_step_indicator;
         global_step_indicator = "bottom_shake_finished";
@@ -203,14 +218,16 @@ class DobotPlating():
         
         global_step_indicator = "excess_shake_move_finished";
      
-    def startProcess(self, EC_Voltage, PD_Voltage, RH_Voltage, processType):
+    def startProcess(self, EC_Voltage, PD_Voltage, RH_Voltage, processType, pdTimeToDo, rhTimeToDo):
         global process_running
         process_running = True;
         global global_status
 
-        self.RH_Duration = 60;
-        if(processType == PROCESS_RH_20):
-            self.RH_Duration = 20;
+        self.RH_Duration = rhTimeToDo;
+        #if(processType == PROCESS_RH_20):
+        #    self.RH_Duration = 20;
+        self.PD_DURATION = pdTimeToDo;
+        
 
         global_status = "Step 1: EC"
         #1
@@ -334,21 +351,29 @@ class PlatingGUI():
         self.pdvar = StringVar(self.root)
         self.rhvar = StringVar(self.root)
         self.processType = StringVar(self.root)
-        
+       
+        self.pdTime = StringVar(self.root)
+        self.rhTime = StringVar(self.root)
+
         ecchoices = {'5.6'}
         pdchoices = { '1.8','1.9','2.0','2.1'}
         rhchoices = { '2.5','2.6','2.75','2.85','3.0'}
         processChoices = {PROCESS_RH_PD, PROCESS_RH_60, PROCESS_RH_20};
+        pdTimeChoices = {'30','40','50','60'}
+        rhTimeChoices = {'20','30','40','50','60'}
        
         self.ecvar.set('5.6') # set the default option
         self.pdvar.set('1.9')
         self.rhvar.set('2.5')
-
         self.processType.set(PROCESS_RH_PD);
+        self.pdTime.set('60');
+        self.rhTime.set('30');
         
         self.ecVoltage = float(self.ecvar.get());
         self.pdVoltage = float(self.pdvar.get());
         self.rhVoltage = float(self.rhvar.get());
+        self.pdTimeToDo = int(self.pdTime.get());
+        self.rhTimeToDo = int(self.rhTime.get());
         self.processToDo = self.processType.get();
         
         processChoicepopupMenu = OptionMenu(self.mainframe, self.processType, *processChoices)
@@ -366,9 +391,21 @@ class PlatingGUI():
         rhpopupMenu.grid(row = 6, column=1)
         rhpopupMenu.bind('<Button-1>', self.dropdownopen)
         
+        rhTimeMenu = OptionMenu(self.mainframe, self.rhTime, *rhTimeChoices)
+        Label(self.mainframe, text="Rh Time", font=("Helvetica", 14)).grid(row = 10, column = 1, pady=(15,2))
+        rhTimeMenu.grid(row = 11, column=1)
+        rhTimeMenu.bind('<Button-1>', self.dropdownopen)
+        
+        pdTimeMenu = OptionMenu(self.mainframe, self.pdTime, *pdTimeChoices)
+        Label(self.mainframe, text="Pd Time", font=("Helvetica", 14)).grid(row = 10, column = 0, pady=(15,2))
+        pdTimeMenu.grid(row = 11, column=0)
+        pdTimeMenu.bind('<Button-1>', self.dropdownopen)
+        
         self.ecvar.trace('w', self.ec_change)
         self.pdvar.trace('w', self.pd_change)
         self.rhvar.trace('w', self.rh_change)
+        self.pdTime.trace('w', self.pd_time_change)
+        self.rhTime.trace('w',self.rh_time_change)
         self.processType.trace('w', self.process_change)
 
         ttk.Button(self.mainframe, text="Calibrate", style='my.TButton', command=self.calibrateDobot, width=16).grid(row=2, rowspan=2, column=0, pady=5)
@@ -435,6 +472,16 @@ class PlatingGUI():
         print( 'EC Volt set to '),
         print (self.ecVoltage)
 
+    def rh_time_change(self, *args):
+        self.rhTimeToDo = int(self.rhTime.get());
+        print('Rh Time changed to: ');
+        print (self.rhTimeToDo);
+    
+    def pd_time_change(self, *args):
+        self.pdTimeToDo = int(self.pdTime.get());
+        print('Pd Time changed to: ');
+        print (self.pdTimeToDo);
+
     def process_change(self, *args):
         self.processToDo = self.processType.get();
         print ('Process changed to: '),
@@ -477,7 +524,7 @@ class PlatingGUI():
     def popup(self):
         global process_running
         if(not process_running and self.calibrated):
-           self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage, self.processToDo));
+           self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage, self.processToDo, self.pdTimeToDo, self.rhTimeToDo));
         else:
             self.initialPopup();
     

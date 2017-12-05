@@ -54,7 +54,7 @@ class DigitalVoltControl():
         elif(desiredV > self.maxV):
             print("Desired V is more than max V");
         else:
-            self.set_value(int((10.8 - desiredV) / 0.084));
+            self.set_value(int((10.8 - desiredV) / 0.084) + 1);
 
 #    def __del__(self):
 #        GPIO.cleanup();

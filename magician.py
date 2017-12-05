@@ -226,7 +226,7 @@ class DobotPlating():
         self.RH_Duration = rhTimeToDo;
         #if(processType == PROCESS_RH_20):
         #    self.RH_Duration = 20;
-        self.PD_DURATION = pdTimeToDo;
+        self.PD_Duration = pdTimeToDo;
         
 
         global_status = "Step 1: EC"
@@ -318,10 +318,10 @@ class PlatingGUI():
         self.root = Tk()
         self.root.title("Rh Electroplating")
         
-        self.calibrated = False;
+        self.calibrated = True;
 
         framew = 500; # root w
-        frameh = 300; # root h
+        frameh = 400; # root h
         screenw = self.root.winfo_screenwidth();
         screenh = self.root.winfo_screenheight();
         posx = (screenw/2) - (framew/2);
@@ -334,7 +334,7 @@ class PlatingGUI():
         self.stepIndicator = StringVar();
         self.stepIndicator.set('_init_');
 
-        self.mainframe = ttk.Frame(self.root, padding="10 10 30 30", height=300, width=500)
+        self.mainframe = ttk.Frame(self.root, padding="10 10 30 30", height=400, width=500)
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         self.mainframe.columnconfigure(0, weight=50,minsize=50)
         self.mainframe.rowconfigure(0, weight=50,minsize=50)
@@ -367,7 +367,7 @@ class PlatingGUI():
         self.rhvar.set('2.5')
         self.processType.set(PROCESS_RH_PD);
         self.pdTime.set('60');
-        self.rhTime.set('30');
+        self.rhTime.set('60');
         
         self.ecVoltage = float(self.ecvar.get());
         self.pdVoltage = float(self.pdvar.get());
@@ -392,13 +392,13 @@ class PlatingGUI():
         rhpopupMenu.bind('<Button-1>', self.dropdownopen)
         
         rhTimeMenu = OptionMenu(self.mainframe, self.rhTime, *rhTimeChoices)
-        Label(self.mainframe, text="Rh Time", font=("Helvetica", 14)).grid(row = 10, column = 1, pady=(15,2))
-        rhTimeMenu.grid(row = 11, column=1)
+        Label(self.mainframe, text="Rh Time (s)", font=("Helvetica", 14)).grid(row = 8, column = 1, pady=(15,2))
+        rhTimeMenu.grid(row = 9, column=1)
         rhTimeMenu.bind('<Button-1>', self.dropdownopen)
         
         pdTimeMenu = OptionMenu(self.mainframe, self.pdTime, *pdTimeChoices)
-        Label(self.mainframe, text="Pd Time", font=("Helvetica", 14)).grid(row = 10, column = 0, pady=(15,2))
-        pdTimeMenu.grid(row = 11, column=0)
+        Label(self.mainframe, text="Pd Time (s)", font=("Helvetica", 14)).grid(row = 8, column = 0, pady=(15,2))
+        pdTimeMenu.grid(row = 9, column=0)
         pdTimeMenu.bind('<Button-1>', self.dropdownopen)
         
         self.ecvar.trace('w', self.ec_change)
@@ -409,11 +409,11 @@ class PlatingGUI():
         self.processType.trace('w', self.process_change)
 
         ttk.Button(self.mainframe, text="Calibrate", style='my.TButton', command=self.calibrateDobot, width=16).grid(row=2, rowspan=2, column=0, pady=5)
-        ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(row=8, rowspan=2,column=0, pady=(20,2))
-        ttk.Button(self.mainframe, text="Exit", style='my.TButton', command=self.stopProcess, width=16).grid(row=8, rowspan=2, column=1, pady=(20,2))
+        ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(row=10, rowspan=2,column=0, pady=(20,2))
+        ttk.Button(self.mainframe, text="Exit", style='my.TButton', command=self.stopProcess, width=16).grid(row=10, rowspan=2, column=1, pady=(20,2))
         
         self.processStepIndicator = ttk.Label(self.mainframe, textvariable=self.stepIndicator, font=('Helvetica',7));
-        self.processStepIndicator.grid(row=11,column=1,pady=5)
+        self.processStepIndicator.grid(row=13,column=1,pady=5)
   
         self.root.after(1000, self.updateLabel);
     

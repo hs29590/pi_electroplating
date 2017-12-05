@@ -168,9 +168,15 @@ class DobotPlating():
         self.move_xy(Beakers[id][0], Beakers[id][1], (self.z_up + self.z_down)/2.0 , Beakers[id][3], 0.3); #adding a mid point so that the Joint motion isn't touching th edges of the beakers
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], 0.3);
         #dispStr = "Step " + str(id) + ": ";
+
+        t_end = time.time() + 5;
         while(not self.isMoveFinished()):
             time.sleep(0.01);
-        
+            if(time.time() > t_end):
+                global global_step_indicator;
+                global_step_indicator = "timing error..";
+                break;
+
         global global_step_indicator;
         global_step_indicator = "up_down_beaker " + str(id);
 
@@ -213,8 +219,13 @@ class DobotPlating():
         
         global_step_indicator = "excess_shake_finished";
         
+        t_end = time.time() + 5;
         while(not self.isMoveFinished()):
             time.sleep(0.01);
+            if(time.time() > t_end):
+                global global_step_indicator;
+                global_step_indicator = "timing error..";
+                break;
         
         global_step_indicator = "excess_shake_move_finished";
      

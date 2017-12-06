@@ -169,7 +169,7 @@ class DobotPlating():
         self.move_xy(Beakers[id][0], Beakers[id][1], self.z_down, Beakers[id][3], 0.3);
         #dispStr = "Step " + str(id) + ": ";
 
-        t_end = time.time() + 5;
+        t_end = time.time() + 25;
         while(not self.isMoveFinished()):
             time.sleep(0.01);
             if(time.time() > t_end):
@@ -219,7 +219,7 @@ class DobotPlating():
         
         global_step_indicator = "excess_shake_finished";
         
-        t_end = time.time() + 5;
+        t_end = time.time() + 25;
         while(not self.isMoveFinished()):
             time.sleep(0.01);
             if(time.time() > t_end):

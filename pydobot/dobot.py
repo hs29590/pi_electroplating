@@ -176,8 +176,11 @@ class Dobot(threading.Thread):
         return self._send_command(msg)
 
     def go(self, x, y, z, r=0.):
-        return self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ)
-   
+        response = self._set_ptp_cmd(x, y, z, r, mode=MODE_PTP_MOVJ_XYZ)
+        queued_cmd_idx = struct.unpack_from('Q', response.params, 0)    
+        print('this_queued_cmd_idx is ', queued_cmd_idx)
+        return queued_cmd_idx;
+
     def setHomeParams(self, x, y, z, r):
         return self._setHomeParams(x,y,z,r);
 

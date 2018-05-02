@@ -368,7 +368,7 @@ class PlatingGUI():
 
         ecchoices = {'5.6'}
         pdchoices = { '1.8','1.9','2.0','2.1'}
-        rhchoices = { '2.5','2.6','2.75','2.85','3.0'}
+        rhchoices = { '2.2', '2.3', '2.4','2.5','2.6','2.75','2.85','3.0'}
         processChoices = {PROCESS_RH_PD, PROCESS_RH_60, PROCESS_RH_20};
         pdTimeChoices = {'30','40','50','60'}
         rhTimeChoices = {'20','30','40','50','60'}

@@ -54,9 +54,9 @@ class DobotPlating():
         #self.DobotPort = 'COM4'
         self.DobotPort = dobotPort;
 
-        self.ecRelay = Relay(18);#bcm pin for physical pin 12
-        self.pdRelay = Relay(24);#bcm for physical 18
-        self.rhRelay = Relay(23);#bcm for physical 16
+        self.ecRelay = Relay(16);#bcm pin for physical pin 22
+        self.pdRelay = Relay(12);#bcm for physical 32
+        self.rhRelay = Relay(25);#bcm for physical 36
         self.gripper = ServoGripper(2);
         self.dvc = DigitalVoltControl();
 

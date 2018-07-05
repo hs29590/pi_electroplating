@@ -16,7 +16,7 @@ import RPi.GPIO as GPIO
 
 class DigitalVoltControl():
 
-    def __init__(self, spi_cs = 8, spi_clk = 11, spi_mosi = 10, minV=0.1, maxV=5.0):
+    def __init__(self, spi_cs = 5, spi_clk = 11, spi_mosi = 10, minV=0.1, maxV=5.0):
         self.minV = minV;
         self.maxV = maxV;
         self.SPI_CS_PIN = spi_cs;

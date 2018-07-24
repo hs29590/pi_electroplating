@@ -358,6 +358,7 @@ class PlatingGUI():
         
 
         self.recordFile = open('record_{date:%Y-%m-%d_%H:%M:%S}.txt'.format( date=datetime.datetime.now()), 'w');
+        print("Record File: " + 'record_{date:%Y-%m-%d_%H:%M:%S}.txt'.format( date=datetime.datetime.now()));
 
 
         self.calibrated = True;

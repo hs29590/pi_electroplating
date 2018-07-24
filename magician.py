@@ -589,6 +589,7 @@ class PlatingGUI():
             self.initialPopup();
     
     def __del__(self):
+        self.recordFile.close();
         if self.processThread is not None:
             self.processThread.exit();
         del self.dobotPlating;

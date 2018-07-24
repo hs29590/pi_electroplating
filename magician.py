@@ -54,6 +54,11 @@ class DobotPlating():
         #self.DobotPort = 'COM4'
         self.DobotPort = dobotPort;
 
+        self.greenLightRelay = Relay(17);
+        self.yellowLightRelay = Relay(19);
+        self.redLightRelay = Relay(18);
+        self.sirenRelay = Relay(22);
+
         self.ecRelay = Relay(16);#bcm pin for physical pin 22
         self.pdRelay = Relay(12);#bcm for physical 32
         self.rhRelay = Relay(25);#bcm for physical 36
@@ -78,6 +83,8 @@ class DobotPlating():
         #self.RH_Voltage = 2.5;
         #self.PD_Voltage = 1.9;
         #self.EC_Voltage = 4.8;
+        
+        self.yellowLightRelay.on();
         
         self.home_xyzr = [215, 0, self.z_up, 0];                    
         global global_status
@@ -234,6 +241,9 @@ class DobotPlating():
         process_running = True;
         global global_status
 
+        self.yellowLightRelay.off();
+        self.greenLightRelay.on();
+
         self.RH_Duration = rhTimeToDo;
         #if(processType == PROCESS_RH_20):
         #    self.RH_Duration = 20;
@@ -310,10 +320,21 @@ class DobotPlating():
 
         #Home
         self.move_home()
+        self.greenLightRelay.off();
+        self.yellowLightRelay.on();
         global_status = "Done.."
         process_running = False;
         print("\n DONE \n");
-   
+        self.sirenRelay.on();
+        time.sleep(3);
+        self.sirenRelay.off();
+        time.sleep(1);
+        self.sirenRelay.on();
+        time.sleep(3);
+        self.sirenRelay.off();
+
+  
+
     def __del__(self):
         self.device.close();        
         del self.gripper;
@@ -321,6 +342,10 @@ class DobotPlating():
         del self.ecRelay;
         del self.pdRelay;
         del self.rhRelay;
+        del self.greenLightRelay;
+        del self.yellowLightRelay;
+        del self.redLightRelay;
+        del self.sirenRelay;
         print("Exiting Cleanly..");
            
 

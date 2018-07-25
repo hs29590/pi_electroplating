@@ -5,11 +5,11 @@ import datetime
 import sys
 import serial
 import math
-#from Tkinter import *
-from tkinter import *
-from tkinter import ttk
+from Tkinter import *
+#from tkinter import *
+#from tkinter import ttk
 import tkMessageBox
-#import ttk
+import ttk
 import _thread
 from DigitalVoltControl import DigitalVoltControl
 from Relay import Relay

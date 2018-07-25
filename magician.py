@@ -8,7 +8,7 @@ import math
 #from Tkinter import *
 from tkinter import *
 from tkinter import ttk
-import tkMessageBox
+#import tkMessageBox
 #import ttk
 import _thread
 from DigitalVoltControl import DigitalVoltControl
@@ -578,7 +578,7 @@ class PlatingGUI():
                 self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage, self.processToDo, self.pdTimeToDo, self.rhTimeToDo));
             else:
                 #result = tkMessageBox.askyesno("WARNING", "Trying to Reset The Robot, Please wait 10 sec..")
-                result = tkMessageBox.askquestion("No Challan Number Entered", "Continue without entering Challan Number?", icon='warning')
+                result = messageBox.askquestion("No Challan Number Entered", "Continue without entering Challan Number?", icon='warning')
                 if(result == 'yes'):
                     self.recordFile.write('000000');
                     self.recordFile.write('\n');

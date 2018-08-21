@@ -1,14 +1,12 @@
 #! /usr/bin/env python
 from glob import glob
 import time
-import datetime
 import sys
 import serial
 import math
 #from Tkinter import *
 from tkinter import *
 from tkinter import ttk
-#import tkMessageBox
 #import ttk
 import _thread
 from DigitalVoltControl import DigitalVoltControl
@@ -356,11 +354,6 @@ class PlatingGUI():
         self.root = Tk()
         self.root.title("Rh Electroplating")
         
-
-        self.recordFile = open('record_{date:%Y-%m-%d_%H:%M:%S}.txt'.format( date=datetime.datetime.now()), 'w');
-        print("Record File: " + 'record_{date:%Y-%m-%d_%H:%M:%S}.txt'.format( date=datetime.datetime.now()));
-
-
         self.calibrated = True;
 
         framew = 500; # root w
@@ -393,7 +386,6 @@ class PlatingGUI():
         self.ecvar = StringVar(self.root)
         self.pdvar = StringVar(self.root)
         self.rhvar = StringVar(self.root)
-        self.challanNumberVar = StringVar(self.root);
         self.processType = StringVar(self.root)
        
         self.pdTime = StringVar(self.root)
@@ -451,10 +443,6 @@ class PlatingGUI():
         self.pdTime.trace('w', self.pd_time_change)
         self.rhTime.trace('w',self.rh_time_change)
         self.processType.trace('w', self.process_change)
-
-        e = ttk.Entry(self.mainframe, textvariable = self.challanNumberVar, width=100)
-        e.grid(row=0,column=2);
-        
 
         ttk.Button(self.mainframe, text="Calibrate", style='my.TButton', command=self.calibrateDobot, width=16).grid(row=2, rowspan=2, column=0, pady=5)
         ttk.Button(self.mainframe, text="Start", style='my.TButton',command=self.popup, width=16).grid(row=10, rowspan=2,column=0, pady=(20,2))
@@ -572,25 +560,11 @@ class PlatingGUI():
     def popup(self):
         global process_running
         if(not process_running and self.calibrated):
-            if(len(self.challanNumberVar.get()) > 0):
-                self.recordFile.write(self.challanNumberVar.get());
-                self.recordFile.write('\n');
-                self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage, self.processToDo, self.pdTimeToDo, self.rhTimeToDo));
-            else:
-                #result = tkMessageBox.askyesno("WARNING", "Trying to Reset The Robot, Please wait 10 sec..")
-                result = messageBox.askquestion("No Challan Number Entered", "Continue without entering Challan Number?", icon='warning')
-                if(result == 'yes'):
-                    self.recordFile.write('000000');
-                    self.recordFile.write('\n');
-                    print("Continuing Without Challan Number - 00000 entered in record file");
-                    self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage, self.processToDo, self.pdTimeToDo, self.rhTimeToDo));
-                else:
-                    print("User wants to enter Challan Number, not executing start sequence");
+           self.processThread = _thread.start_new_thread(self.dobotPlating.startProcess, (self.ecVoltage, self.pdVoltage, self.rhVoltage, self.processToDo, self.pdTimeToDo, self.rhTimeToDo));
         else:
             self.initialPopup();
     
     def __del__(self):
-        self.recordFile.close();
         if self.processThread is not None:
             self.processThread.exit();
         del self.dobotPlating;

@@ -54,10 +54,10 @@ class DobotPlating():
         #self.DobotPort = 'COM4'
         self.DobotPort = dobotPort;
 
-        self.greenLightRelay = Relay(17);
-        self.yellowLightRelay = Relay(19);
-        self.redLightRelay = Relay(18);
-        self.sirenRelay = Relay(22);
+        self.greenLightRelay = Relay(19);
+        self.yellowLightRelay = Relay(13);
+        self.redLightRelay = Relay(6);
+        self.sirenRelay = Relay(26);
 
         self.ecRelay = Relay(16);#bcm pin for physical pin 22
         self.pdRelay = Relay(12);#bcm for physical 32
